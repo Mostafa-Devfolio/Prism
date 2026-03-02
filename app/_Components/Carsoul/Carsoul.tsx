@@ -45,7 +45,9 @@ export async function CarouselHome({ typee, mainType }: Type) {
                           height={500}
                           className="w-full object-cover"
                           src={
-                            banner.image.url == null ? IMAGE_PLACEHOLDER : `http://localhost:1337${banner.image.url}`
+                            banner.image.url == null
+                              ? IMAGE_PLACEHOLDER
+                              : `***REMOVED***${banner.image.url}`
                           }
                           alt={banner.image?.alternativeText}
                         />
