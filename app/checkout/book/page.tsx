@@ -6,14 +6,26 @@ import { getClass } from '@/services/ApiServices';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { Star } from 'lucide-react';
+import {
+  Star,
+  ShieldCheck,
+  CreditCard,
+  User,
+  Plane,
+  Car,
+  Clock,
+  Banknote,
+  Wallet,
+  ChevronRight,
+  CheckCircle2,
+  Briefcase,
+} from 'lucide-react';
 import { showToast } from 'nextjs-toast-notify';
 
 export default function CheckoutBooking() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { token } = useAuth();
-
   const property = searchParams.get('property');
   const userParam = searchParams.get('user');
   const checkInDate = searchParams.get('checkInDate');
@@ -32,7 +44,7 @@ export default function CheckoutBooking() {
   const roomType = searchParams.get('roomType');
 
   const [propertyStore, setPropertyStore] = useState<IProperty>();
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState();
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -49,7 +61,7 @@ export default function CheckoutBooking() {
   const [specialRequestsText, setSpecialRequestsText] = useState('');
   const [arrivalTime, setArrivalTime] = useState("I don't know");
 
-  const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'wallet' | 'online'>('cash');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const estimatedTaxes = totalAmount ? (Number(totalAmount) * 0.14).toFixed(2) : '0.00';
@@ -103,12 +115,10 @@ export default function CheckoutBooking() {
       checkOutDate: checkOutDate,
       totalAmount: Number(totalAmount),
       status: 'pending',
-
       guestFirstName: firstName,
       guestLastName: lastName,
       guestEmail: email,
       guestPhone: phone,
-
       bookingFor: bookingFor === 'main' ? 'main_guest' : 'someone_else',
       travelForWork: travelForWork === 'yes',
       arrivalTime: arrivalTime,
@@ -117,7 +127,6 @@ export default function CheckoutBooking() {
       airportTaxiRequested: airportTaxi,
       paperlessConfirmation: paperless,
       specialRequests: specialRequestsText,
-
       bookedRooms: [
         {
           roomTypeId: Number(roomTypeId),
@@ -151,215 +160,187 @@ export default function CheckoutBooking() {
   }
 
   return (
-    <div className="bg-gray-50 pb-20 font-sans text-gray-800">
-      <div className="mb-6 border-b bg-white px-4 py-4 shadow-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between text-sm font-medium md:justify-center md:gap-20">
-          <div className="flex items-center text-green-700">
-            <div className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-green-700 text-white">✓</div>
-            Your selection
+    <div className="min-h-screen bg-slate-50 pb-24 font-sans text-slate-900 selection:bg-blue-500 selection:text-white">
+      <div className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
+        <div className="mx-auto flex h-20 max-w-6xl items-center justify-center gap-4 px-4 sm:gap-6">
+          <div className="flex items-center gap-2 text-sm font-bold text-emerald-600">
+            <CheckCircle2 size={20} />
+            <span className="hidden sm:inline">Your selection</span>
           </div>
-          <div className="flex items-center border-b-2 border-blue-700 pb-1 font-bold text-blue-700">
-            <div className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-blue-700 text-white">2</div>
-            Details and Finish booking
+          <ChevronRight className="text-slate-300" size={16} />
+          <div className="flex h-full items-center gap-2 border-b-2 border-blue-600 pt-0.5 text-sm font-bold text-blue-600">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
+              2
+            </div>
+            <span>Final Details</span>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 md:grid-cols-3">
-        <div className="md:col-span-1">
-          <div className="sticky top-4 flex flex-col gap-4">
-            <div className="rounded border bg-white shadow-sm">
+      <div className="animate-in fade-in slide-in-from-bottom-4 mx-auto grid max-w-6xl grid-cols-1 items-start gap-10 px-4 pt-10 duration-500 lg:grid-cols-12">
+        {/* Left Sidebar */}
+        <aside className="space-y-6 lg:sticky lg:top-28 lg:col-span-4">
+          <div className="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm">
+            <div className="group relative h-48 w-full overflow-hidden bg-slate-100">
               {propertyStore?.images?.[0]?.url && (
-                <div className="relative h-40 w-full">
-                  <Image
-                    layout="fill"
-                    className="rounded-t object-cover"
-                    src={`${baseURL}${propertyStore?.images?.[0]?.url}`}
-                    alt={`${propertyStore?.name}`}
-                  />
-                </div>
+                <Image
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  src={`${baseURL}${propertyStore.images[0].url}`}
+                  alt="Property"
+                />
               )}
-              <div className="p-4">
-                <p className="mb-1 text-xs text-gray-500">{propertyStore?.propertyType || 'Hotel'}</p>
-                <div className="mb-1 flex">
-                  {Array.from({ length: propertyStore?.starRating || 0 }).map((_, index) => (
-                    <Star key={index} className="h-3 w-3 fill-amber-500 text-yellow-400" />
+              <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 via-transparent to-transparent" />
+              <div className="absolute right-5 bottom-5 left-5 text-white">
+                <p className="mb-1 text-[10px] font-black tracking-widest uppercase opacity-80">
+                  {propertyStore?.propertyType || 'Hotel'}
+                </p>
+                <h3 className="line-clamp-2 text-xl leading-tight font-black">
+                  {propertyStore?.name || 'Property Name'}
+                </h3>
+              </div>
+            </div>
+
+            <div className="space-y-6 p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex gap-1">
+                  {Array.from({ length: propertyStore?.starRating || 0 }).map((_, i) => (
+                    <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                <h3 className="mb-2 text-lg leading-tight font-bold">{propertyStore?.name || 'Property Name'}</h3>
-                <p className="mb-3 text-xs text-gray-600">{propertyStore?.address || 'Address'}</p>
+                <div className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1">
+                  <span className="text-sm font-black text-blue-700">{propertyStore?.userReviewScore || '8.5'}</span>
+                  <span className="text-[10px] font-bold tracking-widest text-blue-600 uppercase">
+                    {propertyStore?.reviewWord || 'Very Good'}
+                  </span>
+                </div>
+              </div>
 
-                <div className="mb-3 flex items-center gap-2">
-                  <div className="rounded-sm rounded-br-none bg-blue-800 px-2 py-1 text-sm font-bold text-white">
-                    {propertyStore?.userReviewScore || '8.5'}
+              <div className="space-y-4 border-t border-slate-100 pt-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase">Check-in</p>
+                    <p className="text-sm font-black text-slate-900">{checkInDate}</p>
+                    <p className="text-[10px] font-bold text-slate-500">14:00 – 23:00</p>
                   </div>
-                  <p className="text-sm font-bold">
-                    {propertyStore?.reviewWord || 'Very Good'}{' '}
-                    <span className="text-xs font-normal text-gray-500">· {propertyStore?.totalReviews} reviews</span>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase">Check-out</p>
+                    <p className="text-sm font-black text-slate-900">{checkOutDate}</p>
+                    <p className="text-[10px] font-bold text-slate-500">07:00 – 12:00</p>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                  <p className="text-sm font-black text-slate-900">
+                    {quantity}x {roomType || 'Room'}
                   </p>
-                </div>
-
-                <div className="mb-3 flex flex-wrap gap-2 text-xs font-medium">
-                  {propertyStore?.isFeatured && (
-                    <span className="rounded bg-orange-100 px-2 py-1 text-orange-800">Featured</span>
-                  )}
-                  {propertyStore?.isHighestRated && (
-                    <span className="rounded bg-blue-100 px-2 py-1 text-blue-800">Highest Rated</span>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-xs font-medium text-green-700">
-                  {propertyStore?.facilitiesCategories?.map((facility: FacilitiesCategory, index) => {
-                    if (index > 3) return null;
-                    return (
-                      <span key={index} className="truncate rounded border border-green-700 px-2 py-1">
-                        ✓ {facility.category}
-                      </span>
-                    );
-                  })}
+                  <p className="mt-1 text-xs font-bold text-slate-500">
+                    {days} nights • {adult} adults
+                  </p>
+                  <button
+                    onClick={goToBooking}
+                    className="mt-3 text-[10px] font-black tracking-widest text-blue-600 uppercase hover:underline"
+                  >
+                    Edit Selection
+                  </button>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="rounded border bg-white p-4 shadow-sm">
-              <h3 className="mb-4 font-bold">Your booking details</h3>
-
-              <div className="mb-4 grid grid-cols-2 gap-4">
-                <div className="border-r pr-2">
-                  <p className="text-sm text-gray-600">Check-in</p>
-                  <p className="text-sm font-bold">{checkInDate}</p>
-                  <p className="text-xs text-gray-500">14:00 – 23:00</p>
-                </div>
-                <div className="pl-2">
-                  <p className="text-sm text-gray-600">Check-out</p>
-                  <p className="text-sm font-bold">{checkOutDate}</p>
-                  <p className="text-xs text-gray-500">07:00 – 12:00</p>
-                </div>
-              </div>
-
-              <p className="text-sm text-gray-600">Total length of stay:</p>
-              <p className="mb-4 text-sm font-bold">{days} nights</p>
-
-              <hr className="mb-4" />
-              <p className="text-sm text-gray-600">You selected</p>
-              <p className="mb-1 text-sm font-bold">
-                {quantity} room for {adult} {adult && Number(adult) > 1 ? 'adults' : 'adult'}
-              </p>
-              <p className="mb-2 text-xs">{roomType}</p>
-              <p onClick={goToBooking} className="w-fit cursor-pointer text-sm text-blue-600 hover:underline">
-                Change your selection
-              </p>
-            </div>
-
-            <div className="rounded border border-blue-200 bg-blue-50 p-4 shadow-sm">
-              <h3 className="mb-4 text-lg font-bold">Your price summary</h3>
-
-              <div className="mb-2 flex justify-between text-sm text-gray-600">
+          <div className="rounded-[2.5rem] bg-slate-900 p-8 text-white shadow-2xl shadow-slate-900/20">
+            <h4 className="mb-6 text-xs font-black tracking-widest text-slate-400 uppercase">Price Summary</h4>
+            <div className="mb-6 space-y-3 border-b border-slate-800 pb-6 text-sm font-medium">
+              <div className="flex justify-between text-slate-400">
                 <span>Original price</span>
                 <span className="line-through">EGP {(Number(totalAmount) * 1.15).toFixed(2)}</span>
               </div>
-
-              <div className="mb-4 flex justify-between text-sm font-medium text-green-700">
+              <div className="flex justify-between text-emerald-400">
                 <span>Early Booker Deal</span>
                 <span>- EGP {(Number(totalAmount) * 0.15).toFixed(2)}</span>
               </div>
-
-              <div className="-mx-4 mb-4 flex items-end justify-between border border-blue-100 bg-white p-4">
-                <span className="text-2xl font-bold text-gray-800">Price</span>
-                <span className="text-3xl font-extrabold text-blue-900">EGP {totalAmount}</span>
-              </div>
-
-              <p className="mb-4 text-right text-xs text-gray-500">
-                Includes EGP {estimatedTaxes} in taxes and charges
-              </p>
-
-              <div className="rounded border bg-white p-3">
-                <h4 className="mb-1 text-sm font-bold">Price information</h4>
-                <ul className="list-disc space-y-2 pl-4 text-xs text-gray-600">
-                  <li>Please note that by Egyptian law all foreign guests must pay in a foreign currency.</li>
-                  <li>Egyptian citizens are required to pay in the local currency.</li>
-                </ul>
-              </div>
             </div>
 
-            <div className="rounded border bg-white p-4 shadow-sm">
-              <h3 className="mb-2 font-bold">Your payment schedule</h3>
-              <p className="mb-4 text-sm font-bold text-green-700">
-                {paymentMethod === 'cash'
-                  ? "No payment today. You'll pay when you stay."
-                  : 'You will pay securely online today.'}
-              </p>
-
-              <h3 className="mb-2 font-bold">How much will it cost to cancel?</h3>
-              <p className="text-sm font-bold text-green-700">Free cancellation anytime</p>
+            <div className="mb-2 flex items-end justify-between">
+              <span className="text-lg font-black tracking-widest text-slate-300 uppercase">Total</span>
+              <span className="text-4xl font-black text-white">EGP {totalAmount}</span>
             </div>
+            <p className="text-right text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+              Includes EGP {estimatedTaxes} in taxes & fees
+            </p>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-6 md:col-span-2">
+          <div className="flex items-center gap-4 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+            <ShieldCheck className="shrink-0 text-emerald-500" size={32} />
+            <p className="text-xs leading-relaxed font-bold text-slate-600">
+              Secure payment processing. Free cancellation available anytime before check-in.
+            </p>
+          </div>
+        </aside>
+
+        {/* Right Main Column: Form */}
+        <main className="space-y-8 lg:col-span-8">
           {token && (
-            <div className="flex items-center gap-4 rounded border bg-white p-4 shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-xl font-bold text-blue-700">
+            <div className="flex items-center gap-4 rounded-[2rem] border border-blue-100 bg-blue-50/50 p-6">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-2xl font-black text-white shadow-lg shadow-blue-200">
                 {firstName ? firstName.charAt(0) : 'U'}
               </div>
               <div>
-                <p className="font-bold">You are signed in</p>
-                <p className="text-sm text-gray-500">{email}</p>
+                <p className="font-black text-slate-900">Signed in as {firstName}</p>
+                <p className="text-sm font-medium text-slate-500">{email}</p>
               </div>
             </div>
           )}
 
-          <div className="rounded border bg-white p-6 shadow-sm">
-            <h2 className="mb-1 text-xl font-bold">Enter your details</h2>
-            <p className="mb-6 flex justify-between text-sm text-gray-500">
-              <span>
-                Almost done! Just fill in the <span className="text-red-600">*</span> required info
-              </span>
-            </p>
+          {/* Section 1: Guest Information */}
+          <section className="space-y-8 rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+                <User size={20} />
+              </div>
+              <h2 className="text-2xl font-black text-slate-900">Guest Details</h2>
+            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-bold">
-                  First name <span className="text-red-600">*</span>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="px-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                  First Name *
                 </label>
                 <input
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="mt-1 w-full rounded border border-gray-400 p-2 outline-blue-600"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 font-bold transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-600"
                 />
               </div>
-              <div>
-                <label className="text-sm font-bold">
-                  Last name <span className="text-red-600">*</span>
+              <div className="space-y-2">
+                <label className="px-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                  Last Name *
                 </label>
                 <input
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="mt-1 w-full rounded border border-gray-400 p-2 outline-blue-600"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 font-bold transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-600"
                 />
               </div>
-
-              <div className="col-span-2 md:col-span-1">
-                <label className="text-sm font-bold">
-                  Email address <span className="text-red-600">*</span>
+              <div className="space-y-2">
+                <label className="px-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                  Email Address *
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 w-full rounded border border-gray-400 p-2 outline-blue-600"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 font-bold transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-600"
                 />
-                <p className="mt-1 text-xs text-gray-500">Confirmation email goes to this address</p>
               </div>
-
-              <div className="col-span-2 md:col-span-1">
-                <label className="text-sm font-bold">
-                  Country/region <span className="text-red-600">*</span>
+              <div className="space-y-2">
+                <label className="px-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                  Country/Region *
                 </label>
                 <select
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
-                  className="mt-1 w-full rounded border border-gray-400 bg-white p-2 outline-blue-600"
+                  className="w-full cursor-pointer appearance-none rounded-2xl border border-slate-200 bg-slate-50 p-4 font-bold transition-all outline-none focus:bg-white"
                 >
                   <option>Egypt</option>
                   <option>United Arab Emirates</option>
@@ -368,246 +349,216 @@ export default function CheckoutBooking() {
                   <option>United States</option>
                 </select>
               </div>
-
-              <div className="col-span-2">
-                <label className="text-sm font-bold">
-                  Phone number <span className="text-red-600">*</span>
+              <div className="space-y-2 sm:col-span-2">
+                <label className="px-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                  Phone Number *
                 </label>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+20 100 000 0000"
-                  className="mt-1 w-full rounded border border-gray-400 p-2 outline-blue-600"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 font-bold transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-600"
                 />
-                <p className="mt-1 text-xs text-gray-500">Needed by the property to validate your booking.</p>
               </div>
             </div>
 
-            <div className="mt-6 flex items-start gap-2">
+            <label className="group flex cursor-pointer items-start gap-4 rounded-3xl border border-slate-100 bg-slate-50 p-4">
               <input
                 type="checkbox"
                 checked={paperless}
                 onChange={() => setPaperless(!paperless)}
-                className="mt-1 h-4 w-4 cursor-pointer accent-blue-600"
+                className="mt-1 h-5 w-5 rounded-lg border-slate-300 text-blue-600 focus:ring-blue-500"
               />
-              <label className="text-sm">
-                Yes, I&#39;d like free paperless confirmation (recommended)
-                <br />
-                <span className="text-gray-500">We&#39;ll text you a link to download our app</span>
-              </label>
-            </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-black text-slate-900 transition-colors group-hover:text-blue-600">
+                  Digital Confirmation (Recommended)
+                </span>
+                <span className="text-xs font-medium text-slate-500">
+                  We&apos;ll text you a paperless link to access your booking offline.
+                </span>
+              </div>
+            </label>
+          </section>
 
-            <hr className="my-6" />
+          {/* Section 2: Preferences */}
+          <section className="space-y-8 rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-sm">
+            <h2 className="text-2xl font-black text-slate-900">Personalize your stay</h2>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <h4 className="text-sm font-black text-slate-900">Who are you booking for?</h4>
+                <div className="flex flex-wrap gap-3">
+                  {[
+                    { id: 'main', label: 'I am the main guest' },
+                    { id: 'other', label: 'Booking for someone else' },
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setBookingFor(opt.id)}
+                      className={`rounded-full border-2 px-6 py-2.5 text-sm font-bold transition-all ${bookingFor === opt.id ? 'border-black bg-black text-white shadow-lg' : 'border-slate-100 bg-white text-slate-600 hover:border-slate-300'}`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            <div className="mb-6">
-              <h3 className="mb-2 text-sm font-bold">
-                Who are you booking for? <span className="font-normal text-gray-500">(optional)</span>
-              </h3>
-              <label className="mb-2 flex cursor-pointer items-center gap-2">
-                <input
-                  type="radio"
-                  value="main"
-                  checked={bookingFor === 'main'}
-                  onChange={() => setBookingFor('main')}
-                  className="h-5 w-5 accent-blue-600"
-                />
-                <span>I am the main guest</span>
-              </label>
-              <label className="flex cursor-pointer items-center gap-2">
-                <input
-                  type="radio"
-                  value="other"
-                  checked={bookingFor === 'other'}
-                  onChange={() => setBookingFor('other')}
-                  className="h-5 w-5 accent-blue-600"
-                />
-                <span>Booking is for someone else</span>
-              </label>
-            </div>
-
-            <div>
-              <h3 className="mb-2 text-sm font-bold">
-                Are you travelling for work? <span className="font-normal text-gray-500">(optional)</span>
-              </h3>
-              <div className="flex gap-6">
-                <label className="flex cursor-pointer items-center gap-2">
-                  <input
-                    type="radio"
-                    value="yes"
-                    checked={travelForWork === 'yes'}
-                    onChange={() => setTravelForWork('yes')}
-                    className="h-5 w-5 accent-blue-600"
-                  />
-                  <span>Yes</span>
-                </label>
-                <label className="flex cursor-pointer items-center gap-2">
-                  <input
-                    type="radio"
-                    value="no"
-                    checked={travelForWork === 'no'}
-                    onChange={() => setTravelForWork('no')}
-                    className="h-5 w-5 accent-blue-600"
-                  />
-                  <span>No</span>
-                </label>
+              <div className="space-y-3">
+                <h4 className="text-sm font-black text-slate-900">Is this a business trip?</h4>
+                <div className="flex gap-3">
+                  {[
+                    { id: 'yes', label: 'Yes' },
+                    { id: 'no', label: 'No' },
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setTravelForWork(opt.id)}
+                      className={`rounded-full border-2 px-8 py-2.5 text-sm font-bold transition-all ${travelForWork === opt.id ? 'border-black bg-black text-white shadow-lg' : 'border-slate-100 bg-white text-slate-600 hover:border-slate-300'}`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="rounded border bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-xl font-bold">{roomType || 'Deluxe Double Room'}</h2>
-            <p className="mb-1 text-sm font-bold text-green-700">✓ Free cancellation anytime</p>
-            <p className="mb-4 text-sm text-gray-600">
-              Guests: {adult} {adult && Number(adult) > 1 ? 'adults' : 'adult'}
-            </p>
+          {/* Section 3: Add-ons & Requests */}
+          <section className="space-y-8 rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-sm">
+            <h2 className="text-2xl font-black text-slate-900">Add-ons & Requests</h2>
 
-            <div className="rounded-md border border-blue-200 bg-blue-50 p-4">
-              <p className="mb-1 text-sm font-bold text-blue-800">Your Genius benefits</p>
-              <p className="text-sm text-blue-900">
-                <strong>13% discount:</strong> You&#39;re getting a discount on the price of this option before taxes
-                and charges are applied.
+            <div className="grid grid-cols-1 gap-4">
+              {[
+                {
+                  state: airportShuttle,
+                  set: setAirportShuttle,
+                  icon: <Plane />,
+                  label: 'Airport Shuttle',
+                  sub: 'Request a pickup from the airport.',
+                },
+                {
+                  state: rentalCar,
+                  set: setRentalCar,
+                  icon: <Car />,
+                  label: 'Rental Car',
+                  sub: 'Save up to 15% off with your Genius rewards.',
+                },
+                {
+                  state: airportTaxi,
+                  set: setAirportTaxi,
+                  icon: <Clock />,
+                  label: 'Airport Taxi',
+                  sub: 'Save 10% on all airport taxis.',
+                },
+              ].map((item, idx) => (
+                <label
+                  key={idx}
+                  className={`flex cursor-pointer items-center gap-5 rounded-3xl border-2 p-6 transition-all ${item.state ? 'border-blue-600 bg-blue-50/20' : 'border-slate-50 bg-slate-50 hover:border-slate-200'}`}
+                >
+                  <input
+                    type="checkbox"
+                    className="hidden"
+                    checked={item.state}
+                    onChange={() => item.set(!item.state)}
+                  />
+                  <div
+                    className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.state ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 shadow-sm'}`}
+                  >
+                    {item.icon}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-black text-slate-900">{item.label}</p>
+                    <p className="mt-1 text-xs font-medium text-slate-500">{item.sub}</p>
+                  </div>
+                  <div
+                    className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${item.state ? 'border-blue-600 bg-blue-600' : 'border-slate-300'}`}
+                  >
+                    {item.state && <div className="h-2 w-2 rounded-full bg-white" />}
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <div className="space-y-3 border-t border-slate-100 pt-6">
+              <label className="flex items-center gap-2 text-sm font-black text-slate-900">
+                <Briefcase size={16} className="text-blue-500" /> Special Requests
+              </label>
+              <textarea
+                rows={4}
+                value={specialRequestsText}
+                onChange={(e) => setSpecialRequestsText(e.target.value)}
+                placeholder="Write your requests in English or Arabic..."
+                className="w-full rounded-[2rem] border border-slate-200 bg-slate-50 p-6 font-medium transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-600"
+              />
+            </div>
+
+            <div className="space-y-4 border-t border-slate-100 pt-6">
+              <label className="flex items-center gap-2 text-sm font-black text-slate-900">
+                <Clock size={16} className="text-emerald-500" /> Estimated Arrival Time
+              </label>
+              <select
+                value={arrivalTime}
+                onChange={(e) => setArrivalTime(e.target.value)}
+                className="w-full max-w-sm cursor-pointer appearance-none rounded-2xl border border-slate-200 bg-slate-50 p-4 font-bold transition-all outline-none focus:ring-2 focus:ring-blue-600"
+              >
+                <option>I don&apos;t know</option>
+                {['12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '22:00'].map((t) => (
+                  <option key={t}>
+                    {t} - {Number(t.split(':')[0]) + 1}:00
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs font-bold text-emerald-600">
+                ✓ Your room will be ready for check-in between 14:00 and 23:00
               </p>
             </div>
-          </div>
+          </section>
 
-          <div className="rounded border bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-xl font-bold">Add to your stay</h2>
-
-            <label className="mb-4 flex cursor-pointer items-start gap-3 rounded border-b p-2 pb-4 hover:bg-gray-50">
-              <input
-                type="checkbox"
-                checked={airportShuttle}
-                onChange={() => setAirportShuttle(!airportShuttle)}
-                className="mt-1 h-5 w-5 accent-blue-600"
-              />
-              <div>
-                <p className="text-sm font-bold">I&#39;m interested in requesting an airport shuttle</p>
-                <p className="text-xs text-gray-600">
-                  We’ll tell your accommodation that you’re interested so they can provide details and costs.
-                </p>
+          {/* Section 4: Payment */}
+          <section className="space-y-8 rounded-[2.5rem] border-2 border-blue-600 bg-white p-8 shadow-2xl shadow-blue-900/10">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white">
+                <CreditCard size={24} />
               </div>
-            </label>
-
-            <label className="mb-4 flex cursor-pointer items-start gap-3 rounded border-b p-2 pb-4 hover:bg-gray-50">
-              <input
-                type="checkbox"
-                checked={rentalCar}
-                onChange={() => setRentalCar(!rentalCar)}
-                className="mt-1 h-5 w-5 accent-blue-600"
-              />
-              <div>
-                <p className="text-sm font-bold">I’m interested in renting a car with up to 15% off</p>
-                <p className="text-xs text-gray-600">
-                  Save up to 15% off on select rental cars with your Genius rewards.
-                </p>
-              </div>
-            </label>
-
-            <label className="flex cursor-pointer items-start gap-3 rounded p-2 hover:bg-gray-50">
-              <input
-                type="checkbox"
-                checked={airportTaxi}
-                onChange={() => setAirportTaxi(!airportTaxi)}
-                className="mt-1 h-5 w-5 accent-blue-600"
-              />
-              <div>
-                <p className="text-sm font-bold">I’m interested in booking an airport taxi with 10% off</p>
-                <p className="text-xs text-gray-600">Save 10% on all airport taxis when you book with us.</p>
-              </div>
-            </label>
-          </div>
-
-          <div className="rounded border bg-white p-6 shadow-sm">
-            <h2 className="mb-2 text-xl font-bold">Special requests</h2>
-            <p className="mb-4 text-sm text-gray-600">
-              Special requests cannot be guaranteed – but the property will do its best to meet your needs. You can
-              always make a special request after your booking is complete!
-            </p>
-            <label className="text-sm font-bold">
-              Please write your requests in English or Arabic.{' '}
-              <span className="font-normal text-gray-500">(optional)</span>
-            </label>
-            <textarea
-              rows={4}
-              value={specialRequestsText}
-              onChange={(e) => setSpecialRequestsText(e.target.value)}
-              className="mt-2 w-full rounded border border-gray-400 p-2 outline-blue-600"
-            />
-          </div>
-
-          <div className="rounded border bg-white p-6 shadow-sm">
-            <h2 className="mb-2 text-xl font-bold">Your arrival time</h2>
-            <p className="mb-1 text-sm font-bold text-green-700">
-              ✓ Your room will be ready for check-in between 14:00 and 23:00
-            </p>
-            <p className="mb-4 text-sm font-bold text-green-700">✓ 24-hour front desk – Help whenever you need it!</p>
-
-            <label className="text-sm font-bold">
-              Add your estimated arrival time <span className="font-normal text-gray-500">(optional)</span>
-            </label>
-            <select
-              value={arrivalTime}
-              onChange={(e) => setArrivalTime(e.target.value)}
-              className="mt-2 block w-full rounded border border-gray-400 bg-white p-2 outline-blue-600 md:w-1/2"
-            >
-              <option>I don&#39;t know</option>
-              <option>12:00 - 13:00</option>
-              <option>13:00 - 14:00</option>
-              <option>14:00 - 15:00</option>
-              <option>15:00 - 16:00</option>
-              <option>16:00 - 17:00</option>
-              <option>17:00 - 18:00</option>
-              <option>22:00 - 23:00</option>
-            </select>
-          </div>
-
-          <div className="rounded border border-blue-400 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-xl font-bold text-blue-900">How do you want to pay?</h2>
-            <div className="flex flex-col gap-3">
-              <label className="flex cursor-pointer items-center gap-3 rounded border border-blue-200 bg-blue-50 p-3">
-                <input
-                  type="radio"
-                  className="h-5 w-5 accent-blue-700"
-                  value="online"
-                  checked={paymentMethod === 'online'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <span className="font-bold text-blue-900">Pay now in full (Credit Card / Visa)</span>
-              </label>
-              <label className="flex cursor-pointer items-center gap-3 rounded border border-green-200 bg-green-50 p-3">
-                <input
-                  type="radio"
-                  className="h-5 w-5 accent-green-700"
-                  value="cash"
-                  checked={paymentMethod === 'cash'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <span className="font-bold text-green-900">Pay at the property (No payment today)</span>
-              </label>
-              <label className="flex cursor-pointer items-center gap-3 rounded border p-3 hover:bg-gray-50">
-                <input
-                  type="radio"
-                  className="h-5 w-5 accent-gray-700"
-                  value="wallet"
-                  checked={paymentMethod === 'wallet'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <span className="font-bold text-gray-800">Pay with Digital Wallet Balance</span>
-              </label>
+              <h2 className="text-2xl font-black text-slate-900">Payment Selection</h2>
             </div>
-          </div>
 
-          <div className="mt-4 flex justify-end">
-            <button
-              disabled={isSubmitting}
-              onClick={() => checkoutBooking()}
-              className="w-full rounded-md bg-blue-600 px-10 py-4 text-lg font-bold text-white shadow transition-all hover:bg-blue-700 disabled:bg-blue-400 md:w-auto"
-            >
-              {isSubmitting ? 'Processing...' : 'Next: Final details >'}
-            </button>
-          </div>
-        </div>
+            <div className="grid grid-cols-1 gap-3">
+              {[
+                { id: 'online', title: 'Pay now in full', sub: 'Credit Card / Visa', color: 'blue' },
+                { id: 'cash', title: 'Pay at the property', sub: 'No payment today', color: 'emerald' },
+                { id: 'wallet', title: 'Digital Wallet Balance', sub: 'Pay with Pyramids Wallet', color: 'slate' },
+              ].map((pay) => (
+                <label
+                  key={pay.id}
+                  className={`flex cursor-pointer items-center gap-4 rounded-3xl border-2 p-6 transition-all ${paymentMethod === pay.id ? `border-${pay.color}-500 bg-${pay.color}-50/30` : 'border-slate-50 bg-slate-50 hover:border-slate-200'}`}
+                >
+                  <input
+                    type="radio"
+                    value={pay.id}
+                    checked={paymentMethod === pay.id}
+                    onChange={(e) => setPaymentMethod(e.target.value as 'cash' | 'wallet' | 'online')}
+                    className={`h-5 w-5 accent-${pay.color}-600`}
+                  />
+                  <div>
+                    <p className="font-black text-slate-900">{pay.title}</p>
+                    <p className="text-xs font-medium text-slate-500">{pay.sub}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <div className="border-t border-slate-100 pt-8">
+              <button
+                disabled={isSubmitting}
+                onClick={checkoutBooking}
+                className="w-full rounded-full bg-slate-900 py-6 text-xl font-black text-white shadow-2xl shadow-slate-900/30 transition-all hover:scale-[1.02] active:scale-95 disabled:bg-slate-400"
+              >
+                {isSubmitting ? 'Confirming...' : 'Complete Booking'}
+              </button>
+            </div>
+          </section>
+        </main>
       </div>
     </div>
   );

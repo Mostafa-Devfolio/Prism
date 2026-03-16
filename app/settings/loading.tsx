@@ -1,6 +1,5 @@
 export default function SettingsSkeleton() {
   return (
-    // Matches the exact padding and wrappers of UserInfo, adding animate-pulse
     <div className="container mx-auto my-5 animate-pulse">
       <div className="my-5">
         <div className="grid grid-cols-1 gap-4 p-5">

@@ -110,8 +110,8 @@ class ApiServices {
     const response = await fetch(`${this.baseUrl}business-types/e-commerce/categories-with-products`, {
       method: 'GET',
       headers: {
-        'content-type': 'application/json'
-      }
+        'content-type': 'application/json',
+      },
     });
     const data = await response.json();
     console.log(data.data.categories);
@@ -186,6 +186,7 @@ class ApiServices {
 &populate[vendor][populate]=true
 &populate[category][populate]=true
 &populate[reviews][populate]=true
+&populate[images][populate]=true
 &populate[businessType][populate]=true`,
       {
         method: 'get',
@@ -212,7 +213,7 @@ class ApiServices {
 
   async getVendorProduct(vendorId: string, whichSubCat: string) {
     const response = await fetch(
-      `${this.baseUrl}vendors/${vendorId}/subcategories/${whichSubCat}/products?&populate=*`,
+      `${this.baseUrl}vendors/${vendorId}/subcategories/${whichSubCat}/products?populate=*`,
       {
         method: 'GET',
       }
@@ -306,10 +307,10 @@ class ApiServices {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     });
-    console.log(response)
+    console.log(response);
     const data = await response.json();
     const datas = data.data;
-    console.log(datas)
+    console.log(datas);
     return datas;
   }
 
@@ -770,7 +771,7 @@ class ApiServices {
     return data;
   }
 
-  async getProperty(propertyId: number, checkIn: string, checkOut: string) {
+  async getProperty(propertyId: string, checkIn: string, checkOut: string) {
     const response = await fetch(
       `${this.baseUrl}properties/${propertyId}/availability?checkInDate=${checkIn}&checkOutDate=${checkOut}`,
       {
@@ -800,7 +801,7 @@ class ApiServices {
     return data;
   }
 
-  async getGeneralProperty(propertyId: number) {
+  async getGeneralProperty(propertyId: string) {
     const response = await fetch(`${this.baseUrl}properties/${propertyId}/details`, {
       method: 'GET',
       headers: {
@@ -823,6 +824,58 @@ class ApiServices {
     const data = await response.json();
     console.log(data);
     return data;
+  }
+
+  async searchByVendors(businessId: string, searchWords: string) {
+    const queryParams = new URLSearchParams({
+      // 1. Search the vendor's name (case-insensitive)
+      'filters[name][$containsi]': searchWords,
+
+      // 2. Restrict to the specific business type
+      'filters[businessType][slug][$eq]': businessId,
+
+      // 3. Enforce the delivery zone
+      // userLat: '30.042482',
+      // userLng: '31.433468',
+
+      // 4. Populate images (optional)
+      // populate: 'image',
+    });
+    const response = await fetch(`${this.baseUrl}vendors?${queryParams.toString()}`, {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    const data = await response.json();
+    console.log('Vendors', data);
+    return data.data;
+  }
+
+  async searchByProducts(businessId: string, searchWords: string) {
+    const queryParams = new URLSearchParams({
+      // 1. Search the vendor's name (case-insensitive)
+      'filters[title][$containsi]': searchWords,
+
+      // 2. Restrict to the specific business type
+      'filters[businessType][slug][$eq]': businessId,
+
+      // 3. Enforce the delivery zone
+      // userLat: '30.042482',
+      // userLng: '31.433468',
+
+      // 4. Populate images (optional)
+      populate: '*',
+    });
+    const response = await fetch(`${this.baseUrl}products?${queryParams.toString()}`, {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+    const data = await response.json();
+    console.log('Products', data);
+    return data.data;
   }
 
   async currency() {

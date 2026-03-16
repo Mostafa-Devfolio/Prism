@@ -15,6 +15,7 @@ type types = {
 export default async function ReuseBusinessTypes({ id, busType, myE }: types) {
   console.log(id);
   const token = await getLoginTo();
+
   if (id == 'restaurants' && token) {
     const data = await getClass.getCartItems(1, token);
   } else if (id == 'groceries' && token) {
@@ -27,91 +28,32 @@ export default async function ReuseBusinessTypes({ id, busType, myE }: types) {
 
   return (
     <>
-      {(id == busType) && (
-        <div className="container mx-auto pt-3">
-          <div className="mx-auto w-full">
+      {id == busType && (
+        <div className="container mx-auto space-y-16 px-4 pt-6 pb-20">
+          <div className="mx-auto w-full overflow-hidden rounded-3xl shadow-2xl shadow-black/5">
             <CarouselHome mainType={id} typee="business_home" />
           </div>
-          <div className="">
-            <h2 className="my-4">Category</h2>
-            <div className="">
-              <HomeCategory mainType={id} />
-            </div>
+
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">Explore Categories</h2>
+            <HomeCategory mainType={id} />
           </div>
-          {id != 'e-commerce' ? <div>
-            <div className="">
+
+          {id != 'e-commerce' ? (
+            <div className="space-y-16">
               <HomeVendorsFetching businessTypee={'discounted'} mainType={id} />
-            </div>
-            <div className="">
               <HomeVendorsFetching businessTypee="most" mainType={id} />
-            </div>
-            <div className="">
               <HomeVendorsFetching businessTypee="top" mainType={id} />
-            </div>
-            <div className="">
               <HomeVendorsFetching businessTypee="latest" mainType={id} />
-            </div>
-            <div className="">
               <HomeVendorsFetching businessTypee="all" mainType={id} />
             </div>
-          </div> : <div className="">
+          ) : (
+            <div className="space-y-16">
               <HomeProductsFetching mainType={id} />
-          </div> }
+            </div>
+          )}
         </div>
       )}
-      {/* {id == myE && (
-        <div className="container mx-auto">
-          <div>
-            <CarouselHome mainType={id} typee="business_home" />
-          </div>
-          <div className="">
-            <h2 className="my-4">Category</h2>
-            <div className="">
-              <HomeCategory mainType={id} />
-            </div>
-          </div>
-          <div className="">
-            <div className="flex items-center justify-between">
-              <h2 className="my-4">Shops with sales</h2>
-            </div>
-            <div>
-              <HomeVendorsFetching businessTypee={'discounted'} mainType={id} />
-            </div>
-          </div>
-          <div className="">
-            <div className="flex items-center justify-between">
-              <h2 className="my-4">Best Sellers</h2>
-            </div>
-            <div>
-              <HomeVendorsFetching businessTypee="most" mainType={id} />
-            </div>
-          </div>
-          <div className="">
-            <div className="flex items-center justify-between">
-              <h2 className="my-4">Top Rated Vendors</h2>
-            </div>
-            <div>
-              <HomeVendorsFetching businessTypee="top" mainType={id} />
-            </div>
-          </div>
-          <div className="">
-            <div className="flex items-center justify-between">
-              <h2 className="my-4">Latest Vendors</h2>
-            </div>
-            <div>
-              <HomeVendorsFetching businessTypee="latest" mainType={id} />
-            </div>
-          </div>
-          <div className="">
-            <div className="flex items-center justify-between">
-              <h2 className="my-4">All Vendors</h2>
-            </div>
-            <div>
-              <HomeVendorsFetching businessTypee="all" mainType={id} />
-            </div>
-          </div>
-        </div>
-      )} */}
     </>
   );
 }

@@ -3,9 +3,6 @@ export default function HomeProductsMainSkeleton() {
     <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
       {Array.from({ length: 8 }).map((_, i) => (
         <div key={i} className="">
-          {/* Added 'animate-pulse' to the main wrapper to make everything inside 
-            fade in and out softly, indicating a loading state. 
-          */}
           <div className="my-3 flex animate-pulse flex-col rounded-2xl border shadow-lg">
             {/* IMAGE PLACEHOLDER */}
             <div className="relative aspect-square rounded-2xl bg-gray-200">

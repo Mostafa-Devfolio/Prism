@@ -15,56 +15,109 @@ export default function OrdersBooking() {
       if (!token) return;
       const data = await getClass.getReservations(token);
       setGetBook(data.data);
-      console.log(getBook);
     }
     getReserve();
   }, [token]);
+
   return (
-    <div className="my-3">
-      <h2>Your booking summary</h2>
-      {getBook?.map((booked: IReserved) => {
-        return (
-          <div key={booked.id} className="my-2 grid grid-cols-8 gap-5 p-3 shadow-sm cursor-pointer">
-            <div className="col-span-1">
-              <Image
-                width={200}
-                height={200}
-                src={`${baseURL}${booked.property.images[0].url}`}
-                alt={booked.property.images[0].alternativeText ?? 'Booking Orders'}
-                className="rounded"
-              />
-            </div>
-            <div className="col-span-4">
-              <h4 className="mb-3">{booked.property.name}</h4>
-              <div className='flex flex-col gap-1'>
-                <div className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px">
-                    <path d="M.311 2.56v6.257a3.75 3.75 0 0 0 1.098 2.651l11.56 11.562a2.25 2.25 0 0 0 3.182 0l6.88-6.88a2.25 2.25 0 0 0 0-3.181L11.468 1.408A3.75 3.75 0 0 0 8.818.31H2.56A2.25 2.25 0 0 0 .31 2.56zm1.5 0a.75.75 0 0 1 .75-.75h6.257a2.25 2.25 0 0 1 1.59.659l11.562 11.56a.75.75 0 0 1 0 1.06l-6.88 6.88a.75.75 0 0 1-1.06 0L2.47 10.409a2.25 2.25 0 0 1-.659-1.59zm5.25 3.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0m1.5 0a2.25 2.25 0 1 0-4.5 0 2.25 2.25 0 0 0 4.5 0"></path>
-                  </svg>
-                  <p>Total price: approx.EGP {booked.totalAmount}</p>
+    <div className="space-y-8 py-4">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase">Booking Summary</h2>
+        <p className="text-sm font-medium text-pretty text-gray-500">
+          Manage your upcoming stays and property reservations.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
+        {getBook?.map((booked: IReserved) => {
+          return (
+            <div
+              key={booked.id}
+              className="group relative flex flex-col gap-6 overflow-hidden rounded-3xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:flex-row"
+            >
+              {/* Image Section */}
+              <div className="relative h-48 w-full shrink-0 overflow-hidden rounded-2xl bg-gray-50 shadow-inner md:h-auto md:w-64">
+                <Image
+                  fill
+                  src={`${baseURL}${booked.property.images[0].url}`}
+                  alt={booked.property.images[0].alternativeText ?? 'Property'}
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                {/* Modern Status Overlay */}
+                <div className="absolute top-3 left-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold tracking-widest text-black uppercase shadow-sm backdrop-blur-md">
+                  Confirmed
                 </div>
-                <div className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px">
-                    <path d="M22.502 13.5v8.25a.75.75 0 0 1-.75.75h-19.5a.75.75 0 0 1-.75-.75V5.25a.75.75 0 0 1 .75-.75h19.5a.75.75 0 0 1 .75.75zm1.5 0V5.25A2.25 2.25 0 0 0 21.752 3h-19.5a2.25 2.25 0 0 0-2.25 2.25v16.5A2.25 2.25 0 0 0 2.252 24h19.5a2.25 2.25 0 0 0 2.25-2.25zm-23.25-3h22.5a.75.75 0 0 0 0-1.5H.752a.75.75 0 0 0 0 1.5M7.502 6V.75a.75.75 0 0 0-1.5 0V6a.75.75 0 0 0 1.5 0m10.5 0V.75a.75.75 0 0 0-1.5 0V6a.75.75 0 0 0 1.5 0"></path>
-                  </svg>
-                  <p>
-                    {booked.checkInDate} - {booked.checkOutDate}
-                  </p>
+              </div>
+
+              {/* Details Section */}
+              <div className="flex flex-1 flex-col justify-between py-2">
+                <div>
+                  <h3 className="mb-4 text-xl font-extrabold text-gray-900 transition-colors group-hover:text-blue-600">
+                    {booked.property.name}
+                  </h3>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {/* Price Chip */}
+                    <div className="flex items-center gap-3 text-sm font-semibold text-gray-700">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                        <i className="fa-solid fa-receipt text-sm"></i>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase">Total Amount</span>
+                        <span>EGP {booked.totalAmount}</span>
+                      </div>
+                    </div>
+
+                    {/* Dates Chip */}
+                    <div className="flex items-center gap-3 text-sm font-semibold text-gray-700">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                        <i className="fa-regular fa-calendar-check text-sm"></i>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase">Stay Period</span>
+                        <span>
+                          {booked.checkInDate} - {booked.checkOutDate}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Rate/Room Chip */}
+                    <div className="flex items-center gap-3 text-sm font-semibold text-gray-700">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-50 text-amber-600">
+                        <i className="fa-solid fa-bed text-sm"></i>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase">Rate ID</span>
+                        <span className="max-w-[150px] truncate">{booked.bookedRooms[0].rateId}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px">
-                    <path d="M2.75 12h18.5c.69 0 1.25.56 1.25 1.25V18l.75-.75H.75l.75.75v-4.75c0-.69.56-1.25 1.25-1.25m0-1.5A2.75 2.75 0 0 0 0 13.25V18c0 .414.336.75.75.75h22.5A.75.75 0 0 0 24 18v-4.75a2.75 2.75 0 0 0-2.75-2.75zM0 18v3a.75.75 0 0 0 1.5 0v-3A.75.75 0 0 0 0 18m22.5 0v3a.75.75 0 0 0 1.5 0v-3a.75.75 0 0 0-1.5 0m-.75-6.75V4.5a2.25 2.25 0 0 0-2.25-2.25h-15A2.25 2.25 0 0 0 2.25 4.5v6.75a.75.75 0 0 0 1.5 0V4.5a.75.75 0 0 1 .75-.75h15a.75.75 0 0 1 .75.75v6.75a.75.75 0 0 0 1.5 0m-13.25-3h7a.25.25 0 0 1 .25.25v2.75l.75-.75h-9l.75.75V8.5a.25.25 0 0 1 .25-.25m0-1.5A1.75 1.75 0 0 0 6.75 8.5v2.75c0 .414.336.75.75.75h9a.75.75 0 0 0 .75-.75V8.5a1.75 1.75 0 0 0-1.75-1.75z"></path>
-                  </svg>
-                  <p>{booked.bookedRooms[0].rateId}</p>
+
+                <div className="mt-8 flex items-center justify-between border-t border-gray-50 pt-4">
+                  <div className="text-xs font-bold tracking-widest text-gray-400 uppercase">Ref: #{booked.id}</div>
+                  <button className="rounded-full bg-black px-6 py-3 text-xs font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-blue-800 active:scale-95">
+                    View Details
+                  </button>
                 </div>
               </div>
             </div>
-                <div className="col-span-3 flex items-end justify-end">
-                    <button className='bg-blue-600 cursor-pointer hover:bg-blue-800 text-white p-2 rounded '>View or update details</button>
-            </div>
+          );
+        })}
+      </div>
+
+      {(!getBook || getBook.length === 0) && (
+        <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-gray-200 bg-gray-50 py-20 text-center">
+          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+            <i className="fa-solid fa-hotel text-3xl"></i>
           </div>
-        );
-      })}
+          <h3 className="text-xl font-bold text-gray-900">No bookings yet</h3>
+          <p className="mb-6 text-gray-500">Find your perfect stay today.</p>
+          <button className="rounded-full bg-black px-10 py-4 font-bold text-white shadow-xl transition-transform hover:scale-105 active:scale-95">
+            Explore Hotels
+          </button>
+        </div>
+      )}
     </div>
   );
 }

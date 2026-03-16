@@ -4,8 +4,9 @@ import { useMemo, useState } from 'react';
 import emailjs from '@emailjs/browser';
 import { Pill, Section } from '../about/Section';
 import { siteData } from '../about/data';
+import { Send, CheckCircle2, AlertCircle } from 'lucide-react';
 
-type Status = { type: 'idle'|'sending'|'success'|'error'; message?: string };
+type Status = { type: 'idle' | 'sending' | 'success' | 'error'; message?: string };
 
 function isEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -50,7 +51,7 @@ export default function ContactSection() {
         return;
       }
 
-      // Fallback: API route (you can wire it to SMTP/Resend/etc.)
+      // Fallback: API route
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -63,80 +64,111 @@ export default function ContactSection() {
     } catch (err: any) {
       setStatus({
         type: 'error',
-        message:
-          err?.message ||
-          'Could not send message. Set EmailJS env vars or configure /api/contact.',
+        message: err?.message || 'Could not send message. Set EmailJS env vars or configure /api/contact.',
       });
     }
   }
 
   return (
-    <Section title="Get in Touch">
-      <div className="grid gap-8 md:grid-cols-[1fr,1.2fr]">
-        <div className="space-y-4">
+    <Section title="Get in Touch" subtitle="Have a project in mind? Let's build something great together.">
+      <div className="mt-8 grid items-start gap-12 lg:grid-cols-12">
+        {/* Left Column: Contact Info Cards */}
+        <div className="animate-in fade-in slide-in-from-left-8 space-y-4 duration-500 lg:col-span-5">
           {c.info.map((i) => (
-            <div key={i.label} className="flex items-center justify-between gap-3 border-l border-stroke pl-4">
+            <div
+              key={i.label}
+              className="flex flex-col justify-between gap-4 rounded-3xl border border-slate-100 bg-slate-50 p-6 transition-colors hover:border-blue-100 hover:bg-blue-50/50 sm:flex-row sm:items-center"
+            >
               <Pill>{i.label}</Pill>
-              {i.label == "Email" ? <a href="mailto:support@devfolio.net" className="text-sm text-text/80">{i.value}</a>: ''}
-              {i.label == "Phone" ? <a href="tel:+201030505992" className="text-sm text-text/80">{i.value}</a>: ''}
-              {i.label != "Phone" && i.label != "Email" ? <span className="text-sm text-text/80">{i.value}</span> : ""}
+              <div className="text-right font-black text-slate-900 sm:text-left">
+                {i.label === 'Email' ? (
+                  <a href={`mailto:${i.value}`} className="transition-colors hover:text-blue-600">
+                    {i.value}
+                  </a>
+                ) : i.label === 'Phone' ? (
+                  <a href={`tel:${i.value}`} className="transition-colors hover:text-blue-600">
+                    {i.value}
+                  </a>
+                ) : (
+                  <span>{i.value}</span>
+                )}
+              </div>
             </div>
           ))}
-          <a href="tel:+"></a>
-
-          {/* <div className="mt-6 rounded-2xl border border-stroke bg-white/0 p-5 text-xs text-text/60">
-            <div className="font-bold text-text/80">Email sending</div>
-            <div className="mt-2">
-              Recommended: set <code className="rounded bg-black/30 px-1.5 py-0.5">NEXT_PUBLIC_EMAILJS_*</code> in <code className="rounded bg-black/30 px-1.5 py-0.5">.env.local</code>.
-              Otherwise the form uses <code className="rounded bg-black/30 px-1.5 py-0.5">/api/contact</code>.
-            </div>
-          </div> */}
         </div>
 
-        <form onSubmit={handleSubmit} className="rounded-2xl border border-stroke bg-white/0 p-6">
-          <div className="grid gap-4 md:grid-cols-2">
+        {/* Right Column: Contact Form */}
+        <form
+          onSubmit={handleSubmit}
+          className="animate-in fade-in slide-in-from-bottom-8 rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-2xl shadow-slate-200/40 duration-700 sm:p-10 lg:col-span-7"
+        >
+          <div className="mb-6 grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="px-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">Full Name</label>
+              <input
+                className="w-full rounded-2xl border border-slate-100 bg-slate-50 p-4 font-bold text-slate-900 transition-all outline-none placeholder:font-medium placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-600"
+                placeholder="John Doe"
+                value={form.name}
+                onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="px-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                Email Address
+              </label>
+              <input
+                className="w-full rounded-2xl border border-slate-100 bg-slate-50 p-4 font-bold text-slate-900 transition-all outline-none placeholder:font-medium placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-600"
+                placeholder="john@example.com"
+                value={form.email}
+                onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div className="mb-6 space-y-2">
+            <label className="px-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">Subject</label>
             <input
-              className="w-full rounded-xl border border-stroke bg-black/5 px-4 py-3 text-sm text-text outline-none ring-0 placeholder:text-text/40 focus:border-accent/50 dark:bg-black/20"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))}
-            />
-            <input
-              className="w-full rounded-xl border border-stroke bg-black/5 px-4 py-3 text-sm text-text outline-none ring-0 placeholder:text-text/40 focus:border-accent/50 dark:bg-black/20"
-              placeholder="Email Address"
-              value={form.email}
-              onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))}
+              className="w-full rounded-2xl border border-slate-100 bg-slate-50 p-4 font-bold text-slate-900 transition-all outline-none placeholder:font-medium placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-600"
+              placeholder="How can I help you?"
+              value={form.subject}
+              onChange={(e) => setForm((s) => ({ ...s, subject: e.target.value }))}
             />
           </div>
 
-          <input
-            className="mt-4 w-full rounded-xl border border-stroke bg-black/5 px-4 py-3 text-sm text-text outline-none ring-0 placeholder:text-text/40 focus:border-accent/50 dark:bg-black/20"
-            placeholder="Subject"
-            value={form.subject}
-            onChange={(e) => setForm((s) => ({ ...s, subject: e.target.value }))}
-          />
+          <div className="mb-8 space-y-2">
+            <label className="px-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">Message</label>
+            <textarea
+              className="h-40 w-full resize-none rounded-3xl border border-slate-100 bg-slate-50 p-6 font-medium text-slate-900 transition-all outline-none placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-600"
+              placeholder="Tell me about your project..."
+              value={form.message}
+              onChange={(e) => setForm((s) => ({ ...s, message: e.target.value }))}
+            />
+          </div>
 
-          <textarea
-            className="mt-4 h-36 w-full resize-none rounded-xl border border-stroke bg-black/5 px-4 py-3 text-sm text-text outline-none ring-0 placeholder:text-text/40 focus:border-accent/50 dark:bg-black/20"
-            placeholder="Your Message"
-            value={form.message}
-            onChange={(e) => setForm((s) => ({ ...s, message: e.target.value }))}
-          />
-
-          <div className="mt-5 flex items-center gap-3">
+          <div className="flex flex-col justify-between gap-6 pt-2 sm:flex-row sm:items-center">
             <button
               type="submit"
               disabled={status.type === 'sending'}
-              className="rounded-xl border border-accent/30 bg-green-800 px-5 py-2.5 text-sm font-bold text-accent transition hover:bg-green-500 disabled:opacity-60"
+              className="flex items-center justify-center gap-2 rounded-full bg-black px-8 py-4 text-sm font-black text-white shadow-xl shadow-black/20 transition-all hover:scale-[1.02] active:scale-95 disabled:scale-100 disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              {status.type === 'sending' ? 'Sending…' : 'Send Message'}
+              {status.type === 'sending' ? (
+                'Sending...'
+              ) : (
+                <>
+                  Send Message <Send size={16} />
+                </>
+              )}
             </button>
 
-            {status.type !== 'idle' ? (
-              <span className={status.type === 'error' ? 'text-sm text-red-400' : 'text-sm text-accent'}>
-                {status.message}
-              </span>
-            ) : null}
+            {/* Status Feedback */}
+            {status.type !== 'idle' && (
+              <div
+                className={`flex items-center gap-2 text-sm font-bold ${status.type === 'error' ? 'text-red-500' : 'text-emerald-600'}`}
+              >
+                {status.type === 'error' ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
+                <span className="max-w-62.5 leading-tight">{status.message}</span>
+              </div>
+            )}
           </div>
         </form>
       </div>

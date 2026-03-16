@@ -1,6 +1,5 @@
 export default function TaxiBookingSkeleton() {
   return (
-    // Main wrapper matching your TaxiBookingPage exactly, adding animate-pulse
     <div className="container mx-auto min-h-screen max-w-md animate-pulse bg-gray-50 px-4 pt-4 pb-24 sm:min-h-full sm:max-w-full">
       {/* 1. PROGRESS BAR SKELETON */}
       <div className="mb-6 flex gap-2">

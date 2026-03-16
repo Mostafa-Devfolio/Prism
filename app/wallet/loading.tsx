@@ -1,6 +1,5 @@
 export default function WalletSkeleton() {
   return (
-    // Main wrapper matching your Wallet container, with animate-pulse
     <div className="container mx-auto animate-pulse">
       {/* 1. HEADER */}
       <div className="flex items-center gap-1">
@@ -12,7 +11,6 @@ export default function WalletSkeleton() {
 
       <div className="my-3">
         {/* 2. BALANCE DISPLAY */}
-        {/* Simulating "Your Balance: {userData?.walletBalance}" */}
         <div className="mb-4 h-6 w-48 rounded bg-gray-300"></div>
 
         {/* 3. HERO-UI TABLE SKELETON */}

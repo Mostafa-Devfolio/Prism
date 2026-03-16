@@ -7,26 +7,29 @@ import { baseURL } from '@/app/page';
 import { useBusiness } from '@/lib/ContextAPI/businessTypeId';
 
 export default function SetBusiness({ business }: { business: IBusiness }) {
-
   const { setBusinessId } = useBusiness();
+
   return (
-    <div className="text-center">
-      <Link className="group" href={`${business.slug}`} onClick={() => setBusinessId(business.id)}>
+    <Link
+      href={`${business.slug}`}
+      onClick={() => setBusinessId(business.id)}
+      className="group flex h-full flex-col items-center rounded-[2.5rem] border border-slate-100 bg-white p-8 text-center shadow-sm transition-all duration-500 hover:-translate-y-2 hover:border-blue-100 hover:shadow-2xl hover:shadow-slate-200/50"
+    >
+      <div className="relative mb-6 flex h-32 w-32 items-center justify-center transition-transform duration-700 group-hover:scale-110">
         <Image
           width={200}
           height={200}
-          className="w-full duration-500 group-hover:rotate-y-180"
+          className="h-full w-full object-contain drop-shadow-md"
           src={`${baseURL}${business.icon.url}`}
-          alt={business.icon.alternativeText ?? 'Banner'}
+          alt={business.icon.alternativeText ?? business.name}
         />
-      </Link>
+      </div>
 
-      <Link href={`${business.slug}`} onClick={() => setBusinessId(business.id)}>
-        <h2 className="text-center">{business.name}</h2>
-      </Link>
-      <Link href={`${business.slug}`} onClick={() => setBusinessId(business.id)}>
-        <p className='truncate'>{business.description}</p>
-      </Link>
-    </div>
+      <h3 className="mb-2 text-xl font-black text-slate-900 transition-colors group-hover:text-blue-600">
+        {business.name}
+      </h3>
+
+      <p className="mt-auto line-clamp-2 text-sm font-medium text-slate-500">{business.description}</p>
+    </Link>
   );
 }

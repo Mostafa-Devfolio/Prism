@@ -17,6 +17,7 @@ import { HeroUIProvider } from '@heroui/react';
 import Statusbar from './_Components/Statusbar/Statusbar';
 import CartCountProvider from '@/lib/ContextAPI/cartCount';
 import { BusinessContextProvider } from '@/lib/ContextAPI/businessTypeId';
+import LocationContextProvider from '@/lib/ContextAPI/locationContext';
 
 config.autoAddCss = false;
 
@@ -41,26 +42,30 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ReduxProviders>
-          <CartSave />
-          <AuthContextProvider>
-            <BusinessContextProvider>
-              <CartCountProvider>
-                <ReactQueryProviders>
-                  <HeroUIProvider>
-                    <Toaster />
-                    <NavBar />
-                    <div className="mx-auto mb-15 w-[90%] sm:mb-0">
-                      {children}
-                      <Statusbar />
-                    </div>
-                    <Footer />
-                  </HeroUIProvider>
-                </ReactQueryProviders>
-              </CartCountProvider>
-            </BusinessContextProvider>
-          </AuthContextProvider>
-        </ReduxProviders>
+        <LocationContextProvider>
+          <BusinessContextProvider>
+            <ReduxProviders>
+              <CartSave />
+              <AuthContextProvider>
+                <BusinessContextProvider>
+                  <CartCountProvider>
+                    <ReactQueryProviders>
+                      <HeroUIProvider>
+                        <Toaster />
+                        <NavBar />
+                        <div className="mx-auto mb-15 w-[90%] sm:mb-0">
+                          {children}
+                          <Statusbar />
+                        </div>
+                        <Footer />
+                      </HeroUIProvider>
+                    </ReactQueryProviders>
+                  </CartCountProvider>
+                </BusinessContextProvider>
+              </AuthContextProvider>
+            </ReduxProviders>
+          </BusinessContextProvider>
+        </LocationContextProvider>
       </body>
     </html>
   );

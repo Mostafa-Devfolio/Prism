@@ -6,11 +6,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { IMAGE_PLACEHOLDER } from '@/lib/image';
 import { IBanner } from '@/app/interface/bannerBusinessTypeInterface';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 
 export default function CarsoulClient({ bannerFiltered }: { bannerFiltered: IBanner[] }) {
   const router = useRouter();
-  console.log(bannerFiltered);
 
   function goToSection(
     target: string,
@@ -36,34 +34,32 @@ export default function CarsoulClient({ bannerFiltered }: { bannerFiltered: IBan
   }
 
   return (
-    <Carousel className="w-full">
+    <Carousel className="group w-full">
       <CarouselContent>
         {bannerFiltered.map((banner: IBanner) => {
           if (!banner.image?.url) return null;
           return (
             <CarouselItem className="relative" key={banner.id}>
-              {/* <CarouselNext /> */}
-              <div className="p-1">
-                <Card className="overflow-hidden">
-                  <CardContent className="flex aspect-3/2 h-47 sm:h-64 items-center justify-center">
-                    <Image
-                      width={1000}
-                      height={1000}
-                      className="w-full h-full object-cover rounded-md"
-                      src={
-                        banner.image.url == null ? IMAGE_PLACEHOLDER : `***REMOVED***${banner.image.url}`
-                      }
-                      alt={banner.image?.alternativeText ?? 'Banner'}
-                    />
-                  </CardContent>
-                </Card>
-                {/* <CarouselPrevious /> */}
-              </div>
-              <div className="">
-                <h2 className="absolute text-center bg-amber-100 rounded-lg top-20 left-[50%] translate-x-[-50%] cursor-default p-2 text-sm text-nowrap sm:text-xl font-bold text-black shadow-lg">
+              <Card className="overflow-hidden rounded-3xl border-0 bg-transparent">
+                <CardContent className="relative flex aspect-21/9 min-h-75 w-full items-center justify-center p-0">
+                  <Image
+                    width={1200}
+                    height={800}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    src={
+                      banner.image.url == null ? IMAGE_PLACEHOLDER : `***REMOVED***${banner.image.url}`
+                    }
+                    alt={banner.image?.alternativeText ?? 'Banner'}
+                    priority
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
+                </CardContent>
+              </Card>
+
+              <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-end p-8 pb-10 sm:p-12">
+                <h2 className="mb-6 text-center text-2xl font-extrabold tracking-tight text-white drop-shadow-md sm:text-4xl">
                   {banner.title}
                 </h2>
-
                 <button
                   onClick={() =>
                     goToSection(
@@ -79,9 +75,9 @@ export default function CarsoulClient({ bannerFiltered }: { bannerFiltered: IBan
                       banner.checkout
                     )
                   }
-                  className="absolute bottom-10 left-[50%] z-1000 translate-x-[-50%] cursor-pointer rounded-md shadow-lg bg-black p-2 text-white hover:bg-blue-800 transition duration-300 ease-in-out"
+                  className="rounded-full bg-white/90 px-8 py-3 text-sm font-semibold text-black shadow-lg backdrop-blur-md transition-all duration-300 ease-out hover:scale-105 hover:bg-white active:scale-95"
                 >
-                  View here
+                  Explore Now
                 </button>
               </div>
             </CarouselItem>

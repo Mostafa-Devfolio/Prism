@@ -2,143 +2,84 @@
 import { IParcelOrders } from '@/app/interface/parcelOrdersInterface';
 import { getLoginTo } from '@/app/login/login';
 import { Button } from '@/components/ui/button';
-import { authContext } from '@/lib/ContextAPI/authContext';
 import { getClass } from '@/services/ApiServices';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 
 const TaxiRoutingMap = dynamic(() => import('@/components/TaxiRoutingMap'), {
   ssr: false,
-  loading: () => (
-    <div className="flex h-[500px] w-full animate-pulse items-center justify-center rounded-xl bg-gray-100">
-      Loading Map...
-    </div>
-  ),
+  loading: () => <div className="h-[300px] w-full animate-pulse rounded-2xl bg-gray-100" />,
 });
 
 export default function ParcelCancelled() {
-  const [saveParcel, setSaveParcel] = useState([]);
+  const [saveParcel, setSaveParcel] = useState<IParcelOrders[]>([]);
 
-  async function getParcel() {
-    const token = await getLoginTo();
-    const userData = await getClass.userProfile(token);
-    const data = await getClass.getParcel(token, userData?.id);
-    const pending = data.filter((par: IParcelOrders) => par.deliveryStatus == 'cancelled');
-    setSaveParcel(pending);
-  }
-
-  async function cancelOrder(orderId: string) {
-    const token = await getLoginTo();
-    const userData = await getClass.userProfile(token);
-    const data = await getClass.deleteParcelOrder(token, orderId);
-    getParcel();
-  }
-
+  
   useEffect(() => {
-    async function getParcels() {
+    async function getParcel() {
       const token = await getLoginTo();
       const userData = await getClass.userProfile(token);
       const data = await getClass.getParcel(token, userData?.id);
-      const pending = data.filter((par: IParcelOrders) => par.deliveryStatus == 'cancelled');
-      setSaveParcel(pending);
+      const filtered = data.filter((par: IParcelOrders) => par.deliveryStatus === 'cancelled');
+      setSaveParcel(filtered);
     }
-    getParcels();
+    getParcel();
   }, []);
+
   return (
-    <div className="">
-      {saveParcel.length != 0 ? (
-        <div className="my-3 grid grid-cols-1 gap-3">
-          {saveParcel.map((parcel: IParcelOrders) => {
-            return (
-              <div key={parcel.id}>
-                {parcel.deliveryStatus == 'cancelled' && (
-                  <div className="grid grid-cols-2 gap-6 rounded-xl border stroke-1 p-4">
-                    <div>
-                      <h4>
-                        Order Id: <span className="text-gray-800">{parcel.id}</span>
-                      </h4>
-                      <h4>
-                        Order Status: <span className="text-red-600">{parcel.deliveryStatus}</span>
-                      </h4>
-                      <h4>
-                        Delivery Time:
-                        <span className="text-gray-800">
-                          {parcel.scheduledAt == null ? ' Now' : parcel.scheduledAt}
-                        </span>
-                      </h4>
-                      <h4>
-                        Payment Method: <span className="text-gray-800">{parcel.paymentMethod}</span>
-                      </h4>
-                      <h4>
-                        Payment Status: <span className="text-gray-800">{parcel.paymentStatus}</span>
-                      </h4>
-                      <h4>
-                        Who pays the order? <span className="text-gray-800">{parcel.payer}</span>
-                      </h4>
-                      <div className="my-5 h-64">
-                        <TaxiRoutingMap
-                          readOnly={true}
-                          initialPickup={{
-                            lat: parcel.pickupLat || parcel.pickupLocation?.lat,
-                            lng: parcel.pickupLng || parcel.pickupLocation?.lng,
-                            address: parcel.pickupLocation?.address,
-                          }}
-                          initialDest={{
-                            lat: parcel.dropoffLat || parcel.dropoffLocation?.lat,
-                            lng: parcel.dropoffLng || parcel.dropoffLocation?.lng,
-                            address: parcel.dropoffLocation?.address,
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="">
-                        <h3>Receiver Details</h3>
-                        <h4>
-                          Receiver Name: <span className="text-gray-800">{parcel.receiverName}</span>
-                        </h4>
-                        <h4>
-                          Receiver Phone: <span className="text-gray-800">{parcel.receiverPhone}</span>
-                        </h4>
-                        <h4>
-                          Receiver Address: <span className="text-gray-800">{parcel.recipientAddress}</span>
-                        </h4>
-                      </div>
-                      <div className="">
-                        <h3>Sender Details</h3>
-                        <h4>
-                          Sender Name: <span className="text-gray-800">{parcel.senderName}</span>
-                        </h4>
-                        <h4>
-                          Sender Phone: <span className="text-gray-800">{parcel.senderPhone}</span>
-                        </h4>
-                        <h4>
-                          Sender Address: <span className="text-gray-800">{parcel.senderAddress}</span>
-                        </h4>
-                      </div>
-                      <div className="">
-                        <h3>Trip Details</h3>
-                        <h4>
-                          Distance Km: <span className="text-gray-800">{parcel.distanceKm} km</span>
-                        </h4>
-                        <h4>
-                          Delivery Fee: <span className="text-gray-800">{parcel.estimatedPrice} EGP</span>
-                        </h4>
-                        <h4>
-                          Notes: <span className="text-gray-800">{parcel.generalNotes}</span>
-                        </h4>
-                      </div>
-                    </div>
-                  </div>
-                )}
+    <div className="space-y-6">
+      {saveParcel.length !== 0 ? (
+        <div className="grid grid-cols-1 gap-6">
+          {saveParcel.map((parcel: IParcelOrders) => (
+            <div
+              key={parcel.id}
+              className="group flex flex-col rounded-3xl border border-gray-100 bg-white opacity-70 shadow-sm grayscale transition-all hover:opacity-100 hover:grayscale-0"
+            >
+              <div className="flex items-center justify-between border-b border-gray-100 p-6 sm:px-8">
+                <div>
+                  <span className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+                    Cancelled Parcel
+                  </span>
+                  <p className="text-lg font-black text-gray-900">#{parcel.id}</p>
+                </div>
+                <div className="rounded-full bg-red-50 px-4 py-1 text-xs font-bold text-red-600 uppercase">
+                  {parcel.deliveryStatus}
+                </div>
               </div>
-            );
-          })}
+
+              <div className="grid grid-cols-1 gap-8 p-6 sm:p-8 lg:grid-cols-2">
+                <div className="h-48 overflow-hidden rounded-2xl border border-gray-50">
+                  <TaxiRoutingMap
+                    readOnly={true}
+                    initialPickup={{
+                      lat: parcel.pickupLat || parcel.pickupLocation?.lat,
+                      lng: parcel.pickupLng || parcel.pickupLocation?.lng,
+                    }}
+                    initialDest={{
+                      lat: parcel.dropoffLat || parcel.dropoffLocation?.lat,
+                      lng: parcel.dropoffLng || parcel.dropoffLocation?.lng,
+                    }}
+                  />
+                </div>
+                <div className="grid grid-cols-1 gap-6 text-sm sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold tracking-wider text-gray-400 uppercase">Receiver</p>
+                    <p className="font-bold text-gray-800">{parcel.receiverName}</p>
+                    <p className="text-gray-500">{parcel.recipientAddress}</p>
+                  </div>
+                  <div className="flex flex-col justify-center rounded-2xl bg-gray-50 p-5">
+                    <p className="mb-1 text-xs font-bold text-gray-400 uppercase">Fee</p>
+                    <p className="text-xl font-black text-gray-400 line-through">{parcel.estimatedPrice} EGP</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center gap-3">
-          <h2>No Parcel Cancelled Orders!</h2>
-          <Button>Shop Now</Button>
+        <div className="flex flex-col items-center justify-center py-20 text-center text-gray-400">
+          <i className="fa-solid fa-ban mb-4 text-5xl"></i>
+          <h2 className="text-xl font-bold">No Cancelled Parcels</h2>
         </div>
       )}
     </div>

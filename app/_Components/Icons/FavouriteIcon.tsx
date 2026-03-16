@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Heart } from 'lucide-react';
 import { getClass } from '@/services/ApiServices';
-import { authContext } from '@/lib/ContextAPI/authContext';
 import { getLoginTo } from '@/app/login/login';
 import { IWishList } from '@/app/interface/wishlist';
 
@@ -27,62 +26,50 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [isAvailablee, setIsAvailablee] = useState(false);
   const [isAvailablee2, setIsAvailablee2] = useState(wishlistItems);
-  const handleToggle = (e: React.MouseEvent) => {
-    // Prevent clicking the heart from also clicking a "Product Card" link
-    e.preventDefault();
-    // e.stopPropagation();
 
+  const handleToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
     const newState = !isFavorite;
     setIsFavorite(newState);
-
-    if (onToggle) {
-      onToggle(newState);
-    }
+    if (onToggle) onToggle(newState);
   };
 
-  async function removeWish(){
+  async function removeWish() {
     const token = await getLoginTo();
     setIsAvailablee2(wishlistItems);
-    const data = await getClass.removeWishList(token, isAvailablee2[0].id);
+    await getClass.removeWishList(token, isAvailablee2[0].id);
     setIsAvailablee(false);
   }
 
   useEffect(() => {
-    async function isAvailable() {
-      if (isWishlisted) {
-        setIsAvailablee(true);
-      }
+    function getReady() {
+      if (isWishlisted) setIsAvailablee(true);
     }
-    isAvailable();
+    getReady();
   }, [isWishlisted]);
 
   return (
-    <>
+    <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-gray-100 bg-white/80 shadow-sm backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-90">
       {isAvailablee ? (
-        <div className="group relative p-2 transition-transform active:scale-90">
-          <Heart
-            onClick={() => removeWish()}
-            size={24}
-            className={`transition-colors duration-300 ${isAvailablee ? 'fill-red-500 stroke-red-500' : ''}`}
-          />
-        </div>
+        <button onClick={removeWish} className="outline-none">
+          <Heart size={22} className="fill-red-500 stroke-red-500 transition-colors" />
+        </button>
       ) : (
-        <div
-          onClick={(e) => {handleToggle(e); onAdd()}}
-          className="group relative p-2 transition-transform active:scale-90"
-          aria-label={isFavorite ? 'Remove from wishlist' : 'Add to wishlist'}
+        <button
+          onClick={(e) => {
+            handleToggle(e);
+            onAdd();
+          }}
+          aria-label={isFavorite ? 'Remove' : 'Add'}
+          className="group outline-none"
         >
           <Heart
-            size={24}
-            className={`transition-colors duration-300 ${
-              isFavorite
-                ? 'fill-red-500 stroke-red-500'
-                : 'fill-transparent stroke-gray-500 group-hover:stroke-gray-700'
-            }`}
+            size={22}
+            className={`transition-colors duration-300 ${isFavorite ? 'fill-red-500 stroke-red-500' : 'fill-transparent stroke-gray-400 group-hover:stroke-gray-800'}`}
           />
-        </div>
+        </button>
       )}
-    </>
+    </div>
   );
 };
 

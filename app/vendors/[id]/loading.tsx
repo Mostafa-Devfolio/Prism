@@ -1,6 +1,5 @@
 export default function VendorPageSkeleton() {
   return (
-    // Added animate-pulse here so the entire page softly flashes
     <div className="animate-pulse">
       {/* 1. VENDOR INFO HEADER (Matches the dark gray bar) */}
       <div className="container mx-auto mb-3 grid cursor-default grid-cols-1 rounded-br-2xl rounded-bl-2xl border-b bg-gray-800 p-3 text-white md:flex md:items-center md:gap-4">

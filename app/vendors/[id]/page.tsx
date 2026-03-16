@@ -25,31 +25,52 @@ export default async function VendorsPage({ params }: { params: Promise<{ id: st
 
   return (
     <>
-      <FinalCartBusinessSolution businessIdd = {business}/>
-      <div className="container mx-auto mb-3 grid cursor-default grid-cols-1 rounded-br-2xl rounded-bl-2xl border-b bg-gray-800 p-3 text-white md:flex md:items-center md:gap-4">
-        <h1 className="bg-linear-to-r from-purple-300 to-red-400 bg-clip-text text-center whitespace-nowrap text-transparent md:w-fit">
-          {vendor.name}
-        </h1>
-        <div className="grid grid-cols-2 md:flex md:w-full md:justify-between">
-          <p className="text-white">
-            <Icon className="text-xl text-yellow-400" /> {vendor.rating}
-          </p>
-          <p>Delivery Time: {vendor.deliveryTime}</p>
-          <p>Delivery Fee: {vendor.deliveryFee} EGP</p>
-          <div className="flex gap-1">
-            <p className="text-white">Status:</p>{' '}
-            {vendor.isOpen ? <p className="text-green-400">Opened</p> : <p className="text-red-800">Closed</p>}
+      <FinalCartBusinessSolution businessIdd={business} />
+
+      <div className="container mx-auto px-4 pt-6 pb-10">
+        {/* Modern Vendor Hero Header */}
+        <div className="mb-8 flex flex-col gap-6 overflow-hidden rounded-3xl bg-slate-900 p-6 shadow-2xl sm:p-10 md:flex-row md:items-center md:justify-between">
+          <h1 className="bg-linear-to-r from-purple-300 via-pink-300 to-red-300 bg-clip-text text-center text-3xl font-extrabold tracking-tight whitespace-nowrap text-transparent sm:text-4xl md:text-left">
+            {vendor.name}
+          </h1>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 text-sm font-medium md:justify-end">
+            <div className="flex items-center gap-1 rounded-full bg-white/10 px-4 py-2 text-white backdrop-blur-md">
+              <Icon className="text-yellow-400" />
+              <span>{vendor.rating}</span>
+            </div>
+            <div className="rounded-full bg-white/10 px-4 py-2 text-white backdrop-blur-md">
+              Time: {vendor.deliveryTime}
+            </div>
+            <div className="rounded-full bg-white/10 px-4 py-2 text-white backdrop-blur-md">
+              Fee: {vendor.deliveryFee} EGP
+            </div>
+            <div
+              className={`flex items-center gap-2 rounded-full px-4 py-2 text-white backdrop-blur-md ${vendor.isOpen ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}
+            >
+              <span className="relative flex h-2 w-2">
+                <span
+                  className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${vendor.isOpen ? 'bg-green-400' : 'bg-red-400'}`}
+                ></span>
+                <span
+                  className={`relative inline-flex h-2 w-2 rounded-full ${vendor.isOpen ? 'bg-green-500' : 'bg-red-500'}`}
+                ></span>
+              </span>
+              {vendor.isOpen ? 'Open Now' : 'Closed'}
+            </div>
           </div>
         </div>
-      </div>
-      <div className="container mx-auto grid grid-cols-1 gap-3 sm:grid-cols-4">
-        <CategoriesPageComponent
-          categories={categories}
-          banners={banners}
-          coupons={coupons}
-          discountedProduct={discountedProduct}
-          id={id}
-        />
+
+        {/* Categories & Products Layout */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
+          <CategoriesPageComponent
+            categories={categories}
+            banners={banners}
+            coupons={coupons}
+            discountedProduct={discountedProduct}
+            id={id}
+          />
+        </div>
       </div>
     </>
   );

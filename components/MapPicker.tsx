@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { LocateFixed, Loader2 } from 'lucide-react';
 
 const customIcon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -17,7 +18,7 @@ interface MapPickerProps {
   onLocationSelect: (lat: number, lng: number) => void;
 }
 
-// 1. Handles manual map clicks
+// 1. Handles manual map clicks (Logic Preserved 100%)
 const LocationMarker = ({ position, setPosition, onLocationSelect }: any) => {
   const map = useMap();
 
@@ -32,7 +33,7 @@ const LocationMarker = ({ position, setPosition, onLocationSelect }: any) => {
   return position === null ? null : <Marker position={position} icon={customIcon} />;
 };
 
-// 2. The Hyper-Optimized GPS Logic
+// 2. The Hyper-Optimized GPS Logic (Logic Preserved 100%)
 const MapController = ({ setPosition, onLocationSelect, setLocateTrigger }: any) => {
   const map = useMap();
 
@@ -119,7 +120,7 @@ const MapController = ({ setPosition, onLocationSelect, setLocateTrigger }: any)
   return null;
 };
 
-// 3. Main Component
+// 3. Main Component (UI Modernized)
 export default function MapPicker({ onLocationSelect }: MapPickerProps) {
   const [position, setPosition] = useState<L.LatLng | null>(null);
   const [isLocating, setIsLocating] = useState(false);
@@ -134,7 +135,7 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
   };
 
   return (
-    <div className="relative z-0 h-[350px] w-full overflow-hidden rounded-xl border border-gray-300 shadow-sm">
+    <div className="relative z-0 h-full min-h-[400px] w-full overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-100 shadow-inner">
       <MapContainer
         center={[30.0444, 31.2357]}
         zoom={15}
@@ -151,38 +152,17 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
         />
       </MapContainer>
 
+      {/* 2026 Premium Locate Button */}
       <button
         type="button"
         onClick={handleManualLocate}
         title="Go to my exact location"
-        className="absolute right-4 bottom-6 z-[1000] flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-lg transition-all hover:bg-blue-50 hover:text-blue-600"
+        className="absolute right-4 bottom-6 z-[1000] flex h-14 w-14 items-center justify-center rounded-full border border-slate-100 bg-white text-slate-700 shadow-xl shadow-slate-900/10 transition-all hover:scale-105 hover:text-blue-600 active:scale-95"
       >
         {isLocating ? (
-          <svg
-            className="h-6 w-6 animate-spin text-blue-600"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
+          <Loader2 className="h-6 w-6 animate-spin text-blue-600" strokeWidth={2.5} />
         ) : (
-          <svg
-            className="h-6 w-6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"></path>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v8m-4-4h8"></path>
-          </svg>
+          <LocateFixed size={24} strokeWidth={2.5} />
         )}
       </button>
     </div>

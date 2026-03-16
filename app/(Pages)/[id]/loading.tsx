@@ -1,23 +1,18 @@
 export default function HomeLoading() {
   return (
-    // The main wrapper matching your ReuseBusinessTypes layout
-    // 'animate-pulse' is applied here so the whole page softly flashes
     <div className="container mx-auto animate-pulse pt-3">
       {/* 1. CAROUSEL SKELETON */}
-      {/* Matches the aspect-3/2 and h-47 sm:h-64 from CarsoulClient */}
       <div className="mx-auto w-full p-1">
         <div className="aspect-3/2 h-47 w-full rounded-md bg-gray-200 sm:h-64"></div>
       </div>
 
       {/* 2. CATEGORY HORIZONTAL SCROLL SKELETON */}
-      {/* Matches HomeCategory spacing, gap-4, and h-24 w-24 sizing */}
       <div className="mt-4">
         {/* "Category" Title Placeholder */}
         <div className="my-4 h-6 w-24 rounded bg-gray-300"></div>
 
         <div className="no-scrollbar w-full overflow-hidden">
           <div className="flex gap-4">
-            {/* Generating 8 empty category circles/boxes */}
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="flex flex-col items-center gap-2">
                 <div className="h-24 w-24 rounded-2xl border bg-gray-200"></div>
@@ -30,9 +25,6 @@ export default function HomeLoading() {
       </div>
 
       {/* 3. VENDORS / PRODUCTS GRID SKELETON */}
-      {/* This renders 3 rows of grids to simulate the different sections 
-          (e.g., Discounted, Best Sellers, Top Rated) loading in.
-          Matches grid-cols-2 md:grid-cols-4 and gap sizes 100%. */}
       {[1, 2, 3].map((sectionIndex) => (
         <div key={sectionIndex} className="mt-8">
           {/* Section Title Placeholder */}

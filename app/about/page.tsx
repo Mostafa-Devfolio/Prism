@@ -1,105 +1,78 @@
 import React from 'react';
 import { Pill, Section } from './Section';
 import { siteData } from './data';
+import { Code2, Server, Smartphone, BookOpen } from 'lucide-react';
 
 export default function About() {
   const a = siteData.about;
+
   return (
-    <Section title="About Me">
-      <div className="grid gap-8 sm:grid-cols-2">
-        <div className="text-text/75 text-sm leading-7">
-          <div className="text-text font-semibold"><span className='font-bold'>Hello! </span> I’m <span className='font-bold'>Mostafa Sherif</span>.</div>
-          <div className="mt-2">{a.intro}</div>
+    <Section title={a.introTitle || 'About Me'}>
+      <div className="grid items-start gap-12 lg:grid-cols-12">
+        {/* Intro Text */}
+        <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-500 lg:col-span-7">
+          <h3 className="text-3xl leading-tight font-black text-slate-900">
+            Hello! I’m <span className="text-blue-600">Mostafa Sherif</span>.
+          </h3>
+          <p className="text-lg leading-relaxed font-medium text-slate-600">{a.intro}</p>
         </div>
 
-        <div className="text-text/75 grid gap-3 text-sm">
-          {a.info.map((i) => (
-            <div key={i.label} className="border-stroke flex items-center justify-between gap-3 border-l pl-4">
-              <Pill className='text-white'>{i.label}</Pill>
-              {i.label == 'Phone' ? (
-                <a className="text-text/80 font-bold" href="tel:+201030505992">
-                  {i.value}
-                </a>
-              ) : (
-                ''
-              )}
-              {i.label == 'Email' ? (
-                <a className="text-text/80 font-bold" href="mail:support@devfolio.net">
-                  {i.value}
-                </a>
-              ) : (
-                ''
-              )}
-              {i.label != 'Phone' && i.label != 'Email' ? (
-                <span className="text-text/80 font-bold">{i.value}</span>
-              ) : (
-                ''
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-10">
-        <div className="flex items-center gap-3">
-          <span className="bg-black text-accent inline-flex h-8 w-8 items-center justify-center rounded-full">
-            L
-          </span>
-          <div className="text-text text-lg font-extrabold">Learnt Languages</div>
-        </div>
-
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {a.services.map((s) => (
-            <div
-              key={s.title}
-              className="border-stroke rounded-2xl border bg-white/0 p-6 transition hover:bg-white/[0.03]"
-            >
-              <div className="text-text text-base font-bold">{s.title}</div>
-              <div className="text-text/70 mt-2 text-sm leading-6">{s.desc}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* <div className="mt-12 grid gap-6 md:grid-cols-2">
-        {a.pricing.map((p) => (
-          <div key={p.title} className="rounded-2xl border border-stroke bg-white/0 p-6">
-            <div className="flex items-start justify-between">
-              <div className="text-lg font-extrabold text-text">{p.title}</div>
-              <div className="text-text/75">
-                <span className="text-2xl font-extrabold text-text">${p.price}</span>
-                <span className="ml-1 text-xs text-text/60">/ {p.period}</span>
+        {/* Personal Info Card */}
+        <div className="animate-in fade-in slide-in-from-right-8 rounded-[2rem] border border-slate-100 bg-slate-50 p-8 shadow-inner duration-700 lg:col-span-5">
+          <div className="space-y-5">
+            {a.info.map((i) => (
+              <div
+                key={i.label}
+                className="flex items-center justify-between gap-4 border-b border-slate-200/60 pb-5 last:border-0 last:pb-0"
+              >
+                <Pill>{i.label}</Pill>
+                <div className="text-right text-sm font-black text-slate-900">
+                  {i.label === 'Phone' ? (
+                    <a className="transition-colors hover:text-blue-600" href={`tel:${i.value}`}>
+                      {i.value}
+                    </a>
+                  ) : i.label === 'Email' ? (
+                    <a className="transition-colors hover:text-blue-600" href={`mailto:${i.value}`}>
+                      {i.value}
+                    </a>
+                  ) : (
+                    <span>{i.value}</span>
+                  )}
+                </div>
               </div>
-            </div>
-            <ul className="mt-4 space-y-2 text-sm text-text/70">
-              {p.features.map((f: string) => (
-                <li key={f} className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-accent/70" />
-                  {f}
-                </li>
-              ))}
-            </ul>
+            ))}
           </div>
-        ))}
-      </div> */}
+        </div>
+      </div>
 
-      {/* <div className="mt-12 grid gap-4 md:grid-cols-3">
-        {a.testimonials.map((t) => (
-          <div key={t.name} className="rounded-2xl border border-stroke bg-white/0 p-6">
-            <div className="text-sm italic leading-6 text-text/70">“{t.text}”</div>
-            <div className="mt-4 text-sm font-bold text-text">{t.name}</div>
-            <div className="text-xs text-text/60">{t.company}</div>
+      {/* Services / What I Do */}
+      <div className="mt-16 border-t border-slate-100 pt-16">
+        <div className="mb-8 flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-lg">
+            <BookOpen size={24} />
           </div>
-        ))}
-      </div> */}
+          <h3 className="text-2xl font-black tracking-tight text-slate-900">What I Do</h3>
+        </div>
 
-      {/* <div className="mt-12 grid gap-4 md:grid-cols-4">
-        {a.facts.map((f) => (
-          <div key={f.name} className="rounded-2xl border border-stroke bg-white/0 p-5 text-center">
-            <div className="text-sm font-bold text-text">{f.name}</div>
-          </div>
-        ))}
-      </div> */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {a.services.map((s, index) => {
+            const Icon = index === 0 ? Code2 : index === 1 ? Server : Smartphone;
+
+            return (
+              <div
+                key={s.title}
+                className="group flex flex-col rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-900/10"
+              >
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 shadow-inner transition-colors duration-300 group-hover:bg-blue-600 group-hover:text-white">
+                  <Icon size={32} strokeWidth={2.5} />
+                </div>
+                <h4 className="mb-3 text-xl font-black text-slate-900">{s.title}</h4>
+                <p className="mt-auto text-sm leading-relaxed font-medium text-slate-500">{s.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </Section>
   );
 }

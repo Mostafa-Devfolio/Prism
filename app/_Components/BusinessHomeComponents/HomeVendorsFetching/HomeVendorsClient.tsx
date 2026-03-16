@@ -10,20 +10,23 @@ type mainType = {
 };
 
 export default function HomeVendorsClient({ mainType, businessTypee, vendors }: mainType) {
-  const [isGrid, setIsGrid] = useState(true);
+  const titles: Record<string, string> = {
+    discounted: 'Sales & Offers',
+    most: 'Best Vendors',
+    top: 'Top Rated',
+    latest: 'New Arrivals',
+    all: 'All Vendors',
+  };
+
   return (
-    <div>
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        {businessTypee == `discounted` && <h2 className="my-4">Vendors with sales</h2>}
-        {businessTypee == `most` && <h2 className="my-4">Best Vendors</h2>}
-        {businessTypee == `top` && <h2 className="my-4">Top Rated Vendors</h2>}
-        {businessTypee == `latest` && <h2 className="my-4">Latest Vendors</h2>}
-        {businessTypee == `all` && <h2 className="my-4">All Vendors</h2>}
+        <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">{titles[businessTypee]}</h2>
       </div>
-      <div className={`grid grid-cols-2 gap-4 md:grid-cols-4`}>
-        {vendors.map((vendor: IDiscountedVendorsHome) => {
-          return <HomeVendorsMainComponent key={vendor.id} businessTypee={businessTypee} vendor={vendor} />;
-        })}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {vendors.map((vendor: IDiscountedVendorsHome) => (
+          <HomeVendorsMainComponent key={vendor.id} businessTypee={businessTypee} vendor={vendor} />
+        ))}
       </div>
     </div>
   );

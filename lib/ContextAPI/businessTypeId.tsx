@@ -1,13 +1,14 @@
 'use client';
-import { usePathname } from "next/navigation";
-import React, { createContext, useContext, useEffect, useState } from "react";
-
+import { usePathname } from 'next/navigation';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface business {
-    businessId: number | null,
-    setBusinessId: (value: number | null) => void
+  businessId: number | null;
+  setBusinessId: (value: number | null) => void;
+  businessSlug: string | null;
+  setBusinessSlug: (value: string | null) => void;
 }
-export const businessContext = createContext<business|null>(null);
+export const businessContext = createContext<business | null>(null);
 
 export function useBusiness() {
   const context = useContext(businessContext);
@@ -17,32 +18,31 @@ export function useBusiness() {
   return context;
 }
 
-export function BusinessContextProvider({ children }: {children: React.ReactNode}) {
-    const [businessId, setBusinessId] = useState<number|null>(null);
-    const pathName = usePathname();
-    const segment = pathName.split("/").filter(Boolean);
-    const mainPath = segment[0];
+export function BusinessContextProvider({ children }: { children: React.ReactNode }) {
+  const [businessId, setBusinessId] = useState<number | null>(null);
+  const [businessSlug, setBusinessSlug] = useState<string | null>(null);
+  const pathName = usePathname();
+  const segment = pathName.split('/').filter(Boolean);
+  const mainPath = segment[0];
 
-
-    useEffect(() => {
-      function isOnPath() {
-        if(mainPath == 'restaurants'){
-          setBusinessId(1);
-        }
-        else if(mainPath == 'groceries'){
-          setBusinessId(2);
-        }
-        else if(mainPath == 'pharmacies'){
-          setBusinessId(3);
-        }
-        else if(mainPath == 'e-commerce'){
-          setBusinessId(4);
-        }
+  useEffect(() => {
+    function isOnPath() {
+      if (mainPath == 'restaurants') {
+        setBusinessId(1);
+        setBusinessSlug('restaurants');
+      } else if (mainPath == 'groceries') {
+        setBusinessId(2);
+        setBusinessSlug('groceries');
+      } else if (mainPath == 'pharmacies') {
+        setBusinessId(3);
+        setBusinessSlug('pharmacies');
+      } else if (mainPath == 'e-commerce') {
+        setBusinessId(4);
+        setBusinessSlug('e-commerce');
       }
-      isOnPath();
-    },[businessId, setBusinessId]);
+    }
+    isOnPath();
+  }, [businessId, setBusinessId, businessSlug, setBusinessSlug]);
 
-    return <businessContext.Provider value={{ businessId, setBusinessId}}>
-        {children}
-    </businessContext.Provider>
+  return <businessContext.Provider value={{ businessId, setBusinessId, businessSlug, setBusinessSlug }}>{children}</businessContext.Provider>;
 }

@@ -24,7 +24,7 @@ export default function ProductWishlistClient({ productId, isWishlist, wishlistI
     <FavoriteButton
       onAdd={addToWishList}
       isWishlisted={isWishlist}
-      wishlistItems={wishlistItem ? [wishlistItem] : []} // needs to be an array
+      wishlistItems={wishlistItem ? [wishlistItem] : []}
       productId={productId}
     />
   );

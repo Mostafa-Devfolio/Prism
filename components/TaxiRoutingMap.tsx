@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { LocateFixed, MapPin, Navigation } from 'lucide-react';
 
-// 🟢 Fix Leaflet Default Icon Issue in Next.js
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -52,16 +52,10 @@ const userLocationIcon = L.divIcon({
 // --- OPEN SOURCE APIS ---
 const reverseGeocode = async (lat: number, lng: number) => {
   try {
-    // 💡 FIX: Removed 'headers' to stop CORS blockage.
-    // Added '&accept-language=en,ar' to the URL instead!
     const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=ar,en&email=support@devfolio.net`;
-
-    const res = await fetch(url); // No headers object here!
-
+    const res = await fetch(url);
     if (!res.ok) throw new Error(`API returned ${res.status}`);
     const data = await res.json();
-
-    // Returns the beautifully formatted street address
     return data.display_name || 'Unknown Location';
   } catch (error) {
     console.error('Geocoding Error:', error);
@@ -71,11 +65,8 @@ const reverseGeocode = async (lat: number, lng: number) => {
 
 const searchAddress = async (query: string) => {
   try {
-    // 💡 FIX: Same here, removed headers and added accept-language to URL
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=ar,en&email=support@devfolio.net`;
-
-    const res = await fetch(url); // No headers object!
-
+    const res = await fetch(url);
     if (!res.ok) throw new Error(`API returned ${res.status}`);
     return await res.json();
   } catch (error) {
@@ -84,15 +75,12 @@ const searchAddress = async (query: string) => {
   }
 };
 
-// 🟢 FIXED: DETERMINISTIC TRAFFIC SIMULATION
-// This uses math linked to the exact GPS coordinates.
-// It guarantees the traffic colors will NEVER randomly move or flicker!
+// FIXED: DETERMINISTIC TRAFFIC SIMULATION
 const simulateTrafficSegments = (geometry: any[]) => {
   const segments: { positions: any[]; color: string }[] = [];
   let currentSegment: any[] = [];
   let currentColor = '#3b82f6';
 
-  // Seeded math function to lock traffic to specific streets
   const getTrafficColor = (lat: number, lng: number) => {
     const hash = Math.sin(lat * 12.9898 + lng * 78.233) * 43758.5453;
     const rand = hash - Math.floor(hash);
@@ -104,10 +92,8 @@ const simulateTrafficSegments = (geometry: any[]) => {
   geometry.forEach((coord, i) => {
     currentSegment.push(coord);
     if (i > 0 && i % 12 === 0) {
-      // Split route into chunks
       segments.push({ positions: [...currentSegment], color: currentColor });
       currentSegment = [coord];
-      // Generate the color based on the specific coordinate, so it never changes randomly
       currentColor = getTrafficColor(coord[0], coord[1]);
     }
   });
@@ -156,7 +142,6 @@ const MapController = ({ pickup, destination, routeGeometry, currentLocation, re
     if (currentLocation && !pickup?.lat && !destination?.lat && (!routeGeometry || routeGeometry.length === 0)) {
       map.flyTo([currentLocation.lat, currentLocation.lng], 15, { animate: false });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLocation?.lat, currentLocation?.lng, map]);
 
   return null;
@@ -187,31 +172,19 @@ export default function TaxiRoutingMap({
   const [routeGeometry, setRouteGeometry] = useState<any[]>([]);
   const [trafficSegments, setTrafficSegments] = useState<{ positions: any[]; color: string }[]>([]);
   const [distanceKm, setDistanceKm] = useState<string | null>(null);
-
   const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
 
-  // ✅ UPDATED CODE
   useEffect(() => {
-    // 🟢 1. Do not ask for GPS if the map is just displaying an old order
     if (readOnly || !navigator.geolocation) return;
-
     const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        setCurrentLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-      },
+      (pos) => setCurrentLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       (err) => {
-        // 🟢 2. Handle the denial gracefully without throwing scary red console errors
-        if (err.code === 1) {
-          console.log('GPS tracking bypassed: User denied permission.');
-        } else {
-          console.warn('Location tracking issue:', err.message);
-        }
+        if (err.code !== 1) console.warn('Location tracking issue:', err.message);
       },
       { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
     );
-
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [readOnly]); // 🟢 3. Added readOnly to the dependency array
+  }, [readOnly]);
 
   useEffect(() => {
     if (initialPickup && initialDest) {
@@ -235,7 +208,6 @@ export default function TaxiRoutingMap({
       getRoute(pickup.lat, pickup.lng, destination.lat, destination.lng).then((res) => {
         if (res.geometry && res.geometry.length > 0) {
           setRouteGeometry(res.geometry);
-          // 🟢 Calls the newly fixed Stable Algorithm
           setTrafficSegments(simulateTrafficSegments(res.geometry));
           setDistanceKm(res.distanceKm);
           if (onRouteFound && res.distanceKm && !readOnly) {
@@ -288,72 +260,29 @@ export default function TaxiRoutingMap({
   };
 
   return (
-    <div className={`relative z-0 flex flex-col gap-4 ${readOnly ? 'h-full' : ''}`}>
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-slate-100">
       <style>{`
         @keyframes leaflet-ping {
           0% { transform: scale(1); opacity: 0.8; }
           100% { transform: scale(2.5); opacity: 0; }
         }
+        .leaflet-control-container .leaflet-top { z-index: 999; }
+        .leaflet-control-container .leaflet-bottom { z-index: 999; }
       `}</style>
 
-      {!readOnly && (
-        <div className="relative z-[1001] space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-          {distanceKm && (
-            <div className="absolute top-4 right-4 rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-blue-700">
-              {distanceKm} km
-            </div>
-          )}
-          <div className="flex items-center gap-3 pr-16">
-            <div className="h-4 w-4 flex-shrink-0 rounded-full bg-blue-500 shadow-sm" />
-            <input
-              placeholder="Pickup Location"
-              value={pickupSearch}
-              onChange={(e) => setPickupSearch(e.target.value)}
-              onFocus={() => setActiveInput('pickup')}
-              className={`w-full rounded-lg border bg-gray-50 p-3 transition-all outline-none ${activeInput === 'pickup' ? 'bg-white ring-2 ring-blue-500' : 'border-gray-200'}`}
-            />
-          </div>
-          <div className="flex items-center gap-3 pr-16">
-            <div className="h-4 w-4 flex-shrink-0 bg-black shadow-sm" />
-            <input
-              placeholder="Destination"
-              value={destSearch}
-              onChange={(e) => setDestSearch(e.target.value)}
-              onFocus={() => setActiveInput('destination')}
-              className={`w-full rounded-lg border bg-gray-50 p-3 transition-all outline-none ${activeInput === 'destination' ? 'bg-white ring-2 ring-black' : 'border-gray-200'}`}
-            />
-          </div>
-          {suggestions.length > 0 && (
-            <div className="absolute top-[110px] right-0 left-0 z-[1002] max-h-60 overflow-hidden overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl">
-              {suggestions.map((s, i) => (
-                <div
-                  key={i}
-                  onClick={() => handleSuggestionSelect(s)}
-                  className="cursor-pointer border-b p-3 text-sm text-gray-700 last:border-0 hover:bg-gray-50"
-                >
-                  {s.display_name}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      <div
-        className={`relative z-0 w-full overflow-hidden border-gray-300 ${readOnly ? 'h-full flex-1' : 'h-[400px] rounded-xl border'}`}
-      >
+      {/* Immersive Map Background */}
+      <div className="absolute inset-0 z-0 h-full w-full">
         <MapContainer
           center={[30.0444, 31.2357]}
           zoom={15}
           scrollWheelZoom={true}
-          style={{ height: '100%', width: '100%' }}
+          style={{ height: '100%', width: '100%', zIndex: 0 }}
         >
           <TileLayer
             attribution="&copy; OpenStreetMap"
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           />
           <MapEvents onMapClick={handleMapClick} readOnly={readOnly} />
-
           <MapController
             pickup={pickup}
             destination={destination}
@@ -365,14 +294,12 @@ export default function TaxiRoutingMap({
           {currentLocation?.lat && currentLocation?.lng && (
             <Marker position={[currentLocation.lat, currentLocation.lng]} icon={userLocationIcon} zIndexOffset={999} />
           )}
-
           {pickup?.lat && pickup?.lng && (
             <Marker position={[pickup.lat, pickup.lng]} icon={pickupIcon} zIndexOffset={900} />
           )}
           {destination?.lat && destination?.lng && (
             <Marker position={[destination.lat, destination.lng]} icon={destinationIcon} zIndexOffset={900} />
           )}
-
           {driverCoords?.lat && driverCoords?.lng && readOnly && (
             <Marker position={[driverCoords.lat, driverCoords.lng]} icon={carIcon} zIndexOffset={1000} />
           )}
@@ -381,20 +308,85 @@ export default function TaxiRoutingMap({
             <Polyline key={index} positions={segment.positions} color={segment.color} weight={6} opacity={0.9} />
           ))}
         </MapContainer>
-
-        {!readOnly && (
-          <button
-            type="button"
-            onClick={handleLocateMe}
-            className="absolute right-4 bottom-6 z-[1000] flex h-12 w-12 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-lg transition-all hover:bg-blue-50 hover:text-blue-600"
-          >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"></path>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v8m-4-4h8"></path>
-            </svg>
-          </button>
-        )}
       </div>
+
+      {/* Floating 2026 UI Overlays */}
+      {!readOnly && (
+        <div className="pointer-events-none absolute inset-0 z-[1000] flex flex-col justify-between p-4 sm:p-6">
+          {/* Top Floating Search Card */}
+          <div className="pointer-events-auto relative mx-auto w-full max-w-lg rounded-[2rem] border border-white bg-white/90 p-3 shadow-2xl shadow-slate-900/10 backdrop-blur-xl">
+            {/* Distance Badge */}
+            {distanceKm && (
+              <div className="absolute -top-4 right-6 rounded-full bg-blue-600 px-4 py-1 text-xs font-black tracking-widest text-white uppercase shadow-lg">
+                {distanceKm} KM
+              </div>
+            )}
+
+            <div className="space-y-2">
+              {/* Pickup Input */}
+              <div
+                className={`flex items-center gap-3 rounded-[1.5rem] px-4 py-3 transition-all ${activeInput === 'pickup' ? 'bg-white shadow-md ring-2 ring-blue-500' : 'bg-slate-100 hover:bg-slate-200/50'}`}
+              >
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                  <MapPin size={14} />
+                </div>
+                <input
+                  placeholder="Where from?"
+                  value={pickupSearch}
+                  onChange={(e) => setPickupSearch(e.target.value)}
+                  onFocus={() => setActiveInput('pickup')}
+                  className="w-full bg-transparent text-sm font-bold text-slate-900 outline-none placeholder:font-medium placeholder:text-slate-400"
+                />
+              </div>
+
+              {/* Connecting Line Visual (CSS only) */}
+              <div className="absolute top-[50px] left-[34px] h-6 w-[2px] border-l-2 border-dotted border-slate-300 bg-slate-200" />
+
+              {/* Destination Input */}
+              <div
+                className={`flex items-center gap-3 rounded-[1.5rem] px-4 py-3 transition-all ${activeInput === 'destination' ? 'bg-white shadow-md ring-2 ring-slate-900' : 'bg-slate-100 hover:bg-slate-200/50'}`}
+              >
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-700">
+                  <Navigation size={14} />
+                </div>
+                <input
+                  placeholder="Where to?"
+                  value={destSearch}
+                  onChange={(e) => setDestSearch(e.target.value)}
+                  onFocus={() => setActiveInput('destination')}
+                  className="w-full bg-transparent text-sm font-bold text-slate-900 outline-none placeholder:font-medium placeholder:text-slate-400"
+                />
+              </div>
+            </div>
+
+            {/* Floating Suggestions */}
+            {suggestions.length > 0 && (
+              <div className="absolute top-full right-0 left-0 mt-2 max-h-60 overflow-y-auto rounded-[1.5rem] border border-slate-100 bg-white p-2 shadow-2xl">
+                {suggestions.map((s, i) => (
+                  <div
+                    key={i}
+                    onClick={() => handleSuggestionSelect(s)}
+                    className="cursor-pointer rounded-xl p-3 text-sm font-bold text-slate-700 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                  >
+                    <p className="line-clamp-2">{s.display_name}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Floating Locate Button */}
+          <div className="pointer-events-auto flex justify-end pb-24 lg:pb-0">
+            <button
+              type="button"
+              onClick={handleLocateMe}
+              className="flex h-14 w-14 items-center justify-center rounded-full border border-slate-100 bg-white text-slate-700 shadow-xl shadow-slate-900/10 transition-transform hover:scale-105 hover:text-blue-600 active:scale-95"
+            >
+              <LocateFixed size={24} strokeWidth={2.5} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
