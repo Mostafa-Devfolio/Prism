@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="http://prism.devfolio.net/"><img src="http://prism.devfolio.net/uploads/booking.png" alt="Prism" width="200"></a>
+  <a href="https://prism.devfolio.net/"><img src="https://prism.devfolio.net/uploads/prism.png" alt="Prism" width="200"></a>
   <br>
   Prism | Multi-Vendor E-Commerce & Service Ecosystem
   <br>
@@ -15,7 +15,7 @@
   <a href="#-core-features--functionality">Key Features</a> •
   <a href="#-architecture--state-management">Architecture</a> •
   <a href="#-getting-started">Getting Started</a> •
-  <a href="http://prism.devfolio.net/">Live Demo</a>
+  <a href="https://prism.devfolio.net/">Live Demo</a>
 </p>
 
 ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
@@ -87,7 +87,7 @@ To get a local copy up and running, follow these simple steps.
 
 1. **Clone the repository**
    ```sh
-   git clone [https://github.com/Mostafa-Devfolio/prism.git](https://github.com/Mostafa-Devfolio/prism.git)
+   git clone [https://github.com/Mostafa-Devfolio/Prism.git](https://github.com/Mostafa-Devfolio/prism.git)
 Navigate to the project directory
 
 Bash
