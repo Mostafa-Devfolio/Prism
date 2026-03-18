@@ -8,6 +8,8 @@
 
 <h4 align="center">A highly scalable, enterprise-grade platform unifying retail, logistics, and accommodation bookings.</h4>
 
+<h4 align="center">Developed by <a href="https://devfolio.net">Mostafa Sherif</a> , you can contact me there.</h4>
+
 <p align="center">
   <a href="#-tech-stack">Tech Stack</a> •
   <a href="#-core-features--functionality">Key Features</a> •
