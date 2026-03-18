@@ -72,12 +72,10 @@ class ApiServices {
       },
     });
     const data = await response.json();
-    console.log(data);
     return data;
   }
 
   async getHomeCategories(mainType: string) {
-    console.log(mainType);
     const response = await fetch(
       `${this.baseUrl}categories?filters[businessType][slug][$eq]=${mainType}&filters[parent][$null]=true&populate=*`,
       {
@@ -91,7 +89,6 @@ class ApiServices {
     const response = await fetch(`${this.baseUrl}business-types/${businessId}/categories/${categoryId}/target`, {
       method: 'get',
     }).then((res) => res.json());
-    console.log(response.data);
     return response.data;
   }
 
@@ -102,7 +99,6 @@ class ApiServices {
         method: 'GET',
       }
     ).then((res) => res.json());
-    console.log(response);
     return response.data;
   }
 
@@ -114,7 +110,6 @@ class ApiServices {
       },
     });
     const data = await response.json();
-    console.log(data.data.categories);
     return data.data.categories;
   }
 
@@ -222,7 +217,6 @@ class ApiServices {
   }
 
   async login(userData: login) {
-    console.log(userData);
     const response = await fetch(`${this.baseUrl}auth/login`, {
       method: 'POST',
       headers: {
@@ -231,7 +225,6 @@ class ApiServices {
       body: JSON.stringify(userData),
     });
     const data = await response.json();
-    console.log(data);
     if (response.ok) {
       return data;
     } else {
@@ -307,10 +300,8 @@ class ApiServices {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     });
-    console.log(response);
     const data = await response.json();
     const datas = data.data;
-    console.log(datas);
     return datas;
   }
 
@@ -742,7 +733,6 @@ class ApiServices {
       },
     });
     const data = await response.json();
-    console.log(data);
     return data;
   }
 
@@ -755,7 +745,6 @@ class ApiServices {
       },
     });
     const data = await response.json();
-    console.log(data);
     return data;
   }
 
@@ -767,7 +756,6 @@ class ApiServices {
       },
     });
     const data = await response.json();
-    console.log(data);
     return data;
   }
 
@@ -782,12 +770,10 @@ class ApiServices {
       }
     );
     const data = await response.json();
-    console.log(data);
     return data;
   }
 
   async bookProperty(token: string, body: any) {
-    console.log(body);
     const response = await fetch(`${this.baseUrl}reservations`, {
       method: 'POST',
       headers: {
@@ -797,7 +783,6 @@ class ApiServices {
       body: JSON.stringify({ data: body }),
     });
     const data = await response.json();
-    console.log(data);
     return data;
   }
 
@@ -809,7 +794,6 @@ class ApiServices {
       },
     });
     const data = await response.json();
-    console.log(data);
     return data;
   }
 
@@ -822,7 +806,6 @@ class ApiServices {
       },
     });
     const data = await response.json();
-    console.log(data);
     return data;
   }
 
@@ -848,7 +831,6 @@ class ApiServices {
       },
     });
     const data = await response.json();
-    console.log('Vendors', data);
     return data.data;
   }
 
@@ -874,7 +856,6 @@ class ApiServices {
       },
     });
     const data = await response.json();
-    console.log('Products', data);
     return data.data;
   }
 

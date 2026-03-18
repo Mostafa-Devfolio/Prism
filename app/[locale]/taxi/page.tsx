@@ -23,7 +23,6 @@ import {
   CheckCircle2,
   User,
 } from 'lucide-react';
-import { baseURL2 } from '../page';
 
 const TaxiRoutingMap = dynamic(() => import('@/components/TaxiRoutingMap'), {
   ssr: false,
@@ -82,17 +81,17 @@ export default function TaxiBookingPage() {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         };
 
-        const resPricing = await fetch(`${baseURL2}pricing-config`, { headers });
+        const resPricing = await fetch('https://pyramid.devfolio.net/api/pricing-config', { headers });
         const jsonPricing = await resPricing.json();
         if (jsonPricing?.data) setPricing(jsonPricing.data);
 
-        const resWallet = await fetch(`${baseURL2}loyalty/me`, { headers });
+        const resWallet = await fetch('https://pyramid.devfolio.net/api/loyalty/me', { headers });
         const jsonWallet = await resWallet.json();
         if (jsonWallet?.data?.walletBalance) setWalletBalance(Number(jsonWallet.data.walletBalance));
 
         if (token) {
           const resActive = await fetch(
-            `${baseURL2}rides?filters[status][$in][0]=pending&filters[status][$in][1]=accepted&filters[status][$in][2]=arrived&filters[status][$in][3]=in_progress&populate=*`,
+            'https://pyramid.devfolio.net/api/rides?filters[status][$in][0]=pending&filters[status][$in][1]=accepted&filters[status][$in][2]=arrived&filters[status][$in][3]=in_progress&populate=*',
             { headers }
           );
           const jsonActive = await resActive.json();
@@ -121,7 +120,7 @@ export default function TaxiBookingPage() {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           };
           const res = await fetch(
-            `${baseURL2}pricing-config?lat=${tripData.pickup.lat}&lng=${tripData.pickup.lng}`,
+            `https://pyramid.devfolio.net/api/pricing-config?lat=${tripData.pickup.lat}&lng=${tripData.pickup.lng}`,
             { headers }
           );
           const json = await res.json();
@@ -140,7 +139,7 @@ export default function TaxiBookingPage() {
       interval = setInterval(async () => {
         try {
           const token = await getLoginTo();
-          const res = await fetch(`${baseURL2}rides/${activeTrip.documentId}?populate=*`, {
+          const res = await fetch(`https://pyramid.devfolio.net/api/rides/${activeTrip.documentId}?populate=*`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           const json = await res.json();
@@ -184,7 +183,7 @@ export default function TaxiBookingPage() {
     try {
       const token = await getLoginTo();
       const res = await fetch(
-        `${baseURL2}bus-trips/searchNearMe?pickupLat=${tripData.pickup.lat}&pickupLng=${tripData.pickup.lng}&destLat=${tripData.dest.lat}&destLng=${tripData.dest.lng}`,
+        `https://pyramid.devfolio.net/api/bus-trips/searchNearMe?pickupLat=${tripData.pickup.lat}&pickupLng=${tripData.pickup.lng}&destLat=${tripData.dest.lat}&destLng=${tripData.dest.lng}`,
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
       const json = await res.json();
@@ -203,7 +202,7 @@ export default function TaxiBookingPage() {
     if (vehicle === 'bus' && selectedBus) {
       try {
         const busId = selectedBus.documentId || selectedBus.id;
-        const res = await fetch(`${baseURL2}bus-trips/${busId}/book`, {
+        const res = await fetch(`https://pyramid.devfolio.net/api/bus-trips/${busId}/book`, {
           method: 'POST',
           headers,
           body: JSON.stringify({ data: { paymentMethod } }),
@@ -211,7 +210,7 @@ export default function TaxiBookingPage() {
         const json = await res.json();
         if (json.error) return alert(`Booking Failed: ${json.error.message}`);
 
-        const payRes = await fetch(`${baseURL2}checkout/universal`, {
+        const payRes = await fetch('https://pyramid.devfolio.net/api/checkout/universal', {
           method: 'POST',
           headers,
           body: JSON.stringify({ moduleType: 'bus', moduleId: json.data.id, amountEgp: targetPrice, paymentMethod }),
@@ -244,7 +243,7 @@ export default function TaxiBookingPage() {
     };
 
     try {
-      const res = await fetch(`${baseURL2}rides`, {
+      const res = await fetch('https://pyramid.devfolio.net/api/rides', {
         method: 'POST',
         body: JSON.stringify({ data: payload }),
         headers,
@@ -255,7 +254,7 @@ export default function TaxiBookingPage() {
 
       if (json.data) {
         setActiveTrip(json.data);
-        const payRes = await fetch(`${baseURL2}checkout/universal`, {
+        const payRes = await fetch('https://pyramid.devfolio.net/api/checkout/universal', {
           method: 'POST',
           headers,
           body: JSON.stringify({
@@ -413,10 +412,10 @@ export default function TaxiBookingPage() {
               <p className="mt-1 font-medium text-slate-500">Pin your pickup and drop-off locations.</p>
             </div>
 
-            <div className="relative h-[60vh] min-h-125 w-full overflow-hidden rounded-[2.5rem] border border-slate-200 shadow-2xl shadow-slate-900/10">
+            <div className="relative h-[60vh] min-h-[500px] w-full overflow-hidden rounded-[2.5rem] border border-slate-200 shadow-2xl shadow-slate-900/10">
               <TaxiRoutingMap onRouteFound={(km, pickup, dest) => setTripData({ km, pickup, dest })} />
 
-              <div className="absolute z-2000 bottom-6 left-1/2 w-full -translate-x-1/2 cursor-pointer px-6">
+              <div className="absolute bottom-6 left-1/2 w-full -translate-x-1/2 px-6">
                 <button
                   onClick={vehicle === 'bus' ? handleFindBuses : () => setStep(3)}
                   disabled={!tripData}
@@ -654,9 +653,9 @@ export default function TaxiBookingPage() {
           </div>
         )}
 
-        {/* STEP 4: Active Ride Dashboard */}
+        {/* 🟢 STEP 4: Active Ride Dashboard (Fixed Scroll & Clipping Bug) */}
         {step === 4 && (
-          <div className="animate-in fade-in fixed inset-0 z-[100] flex h-screen w-full flex-col bg-white">
+          <div className="animate-in fade-in fixed inset-0 z-[100] flex h-[100dvh] w-full flex-col overflow-hidden bg-white">
             {vehicle === 'bus' && !activeTrip ? (
               <div className="flex flex-1 flex-col items-center justify-center bg-emerald-50 p-8 text-center">
                 <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-emerald-500 text-white shadow-2xl shadow-emerald-500/30">
@@ -678,8 +677,8 @@ export default function TaxiBookingPage() {
               </div>
             ) : (
               <>
-                {/* Immersive Full Map Area */}
-                <div className="relative flex-1 bg-slate-200">
+                {/* 🟢 Map Area strictly locked to 45% of screen height so it doesn't fight the flex container */}
+                <div className="relative h-[45vh] w-full shrink-0 bg-slate-200">
                   <TaxiRoutingMap
                     initialPickup={tripData?.pickup}
                     initialDest={tripData?.dest}
@@ -695,117 +694,120 @@ export default function TaxiBookingPage() {
                   </button>
                 </div>
 
-                {/* Bottom Sheet Dashboard */}
-                <div className="relative z-[1001] -mt-10 flex flex-col rounded-t-[2.5rem] bg-white p-8 shadow-[0_-20px_50px_rgba(0,0,0,0.15)]">
-                  {/* Status Pill */}
-                  <div className="mb-8 flex justify-center text-center">
-                    {!activeTrip || activeTrip.status === 'pending' ? (
-                      <div className="inline-flex items-center gap-3 rounded-full border border-blue-100 bg-blue-50 px-6 py-2 text-sm font-black text-blue-700 shadow-sm">
-                        <div className="relative flex h-3 w-3">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
-                          <span className="relative inline-flex h-3 w-3 rounded-full bg-blue-500" />
+                {/* 🟢 Bottom Sheet - Flexible Container driving the scroll */}
+                <div className="relative z-[1001] -mt-6 flex w-full flex-1 flex-col overflow-hidden rounded-t-[2.5rem] bg-white shadow-[0_-20px_50px_rgba(0,0,0,0.15)]">
+                  {/* 🟢 The Scrollable Inner Box with Safe Padding at the bottom */}
+                  <div className="flex-1 overflow-y-auto p-6 pb-24 sm:p-8 sm:pb-12">
+                    {/* Status Pill */}
+                    <div className="mb-8 flex justify-center text-center">
+                      {!activeTrip || activeTrip.status === 'pending' ? (
+                        <div className="inline-flex items-center gap-3 rounded-full border border-blue-100 bg-blue-50 px-6 py-2 text-sm font-black text-blue-700 shadow-sm">
+                          <div className="relative flex h-3 w-3">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
+                            <span className="relative inline-flex h-3 w-3 rounded-full bg-blue-500" />
+                          </div>
+                          Finding your Captain...
                         </div>
-                        Finding your Captain...
+                      ) : (
+                        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-6 py-2 text-sm font-black text-emerald-700 shadow-sm">
+                          {activeTrip.status === 'accepted' && '✅ Captain is on the way'}
+                          {activeTrip.status === 'arrived' && '📍 Captain has arrived!'}
+                          {activeTrip.status === 'in_progress' && '🚗 Heading to Destination'}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Trip Metrics */}
+                    <div className="mb-8 grid grid-cols-3 gap-4 border-b border-slate-100 pb-8">
+                      <div className="border-r border-slate-100 text-center">
+                        <p className="mb-2 text-[10px] font-black tracking-widest text-slate-400 uppercase">Distance</p>
+                        <p className="text-2xl font-black text-slate-900">
+                          {tripData?.km || 0} <span className="text-xs font-bold text-slate-500">km</span>
+                        </p>
+                      </div>
+                      <div className="border-r border-slate-100 text-center">
+                        <p className="mb-2 text-[10px] font-black tracking-widest text-slate-400 uppercase">Fare</p>
+                        <p className="text-2xl font-black text-emerald-500">
+                          {activeTrip?.finalPrice || targetPrice} <span className="text-xs font-bold">EGP</span>
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="mb-2 text-[10px] font-black tracking-widest text-slate-400 uppercase">Time</p>
+                        <p className="text-2xl font-black text-slate-900">
+                          ~{Math.ceil((tripData?.km || 0) * 2.5)}{' '}
+                          <span className="text-xs font-bold text-slate-500">min</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Driver/Status View */}
+                    {!activeTrip || activeTrip.status === 'pending' ? (
+                      <div className="mb-8 flex items-center gap-6 rounded-3xl border border-slate-100 bg-slate-50 p-6">
+                        <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-2xl border border-slate-200 bg-white shadow-sm">
+                          <Car size={32} className="text-slate-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-lg font-black text-slate-900">Broadcasting to drivers...</p>
+                          <p className="text-sm font-medium text-slate-500">Your request is live.</p>
+                        </div>
                       </div>
                     ) : (
-                      <div className="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-6 py-2 text-sm font-black text-emerald-700 shadow-sm">
-                        {activeTrip.status === 'accepted' && '✅ Captain is on the way'}
-                        {activeTrip.status === 'arrived' && '📍 Captain has arrived!'}
-                        {activeTrip.status === 'in_progress' && '🚗 Heading to Destination'}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Trip Metrics */}
-                  <div className="mb-8 grid grid-cols-3 gap-4 border-b border-slate-100 pb-8">
-                    <div className="border-r border-slate-100 text-center">
-                      <p className="mb-2 text-[10px] font-black tracking-widest text-slate-400 uppercase">Distance</p>
-                      <p className="text-2xl font-black text-slate-900">
-                        {tripData?.km || 0} <span className="text-xs font-bold text-slate-500">km</span>
-                      </p>
-                    </div>
-                    <div className="border-r border-slate-100 text-center">
-                      <p className="mb-2 text-[10px] font-black tracking-widest text-slate-400 uppercase">Fare</p>
-                      <p className="text-2xl font-black text-emerald-500">
-                        {activeTrip?.finalPrice || targetPrice} <span className="text-xs font-bold">EGP</span>
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <p className="mb-2 text-[10px] font-black tracking-widest text-slate-400 uppercase">Time</p>
-                      <p className="text-2xl font-black text-slate-900">
-                        ~{Math.ceil((tripData?.km || 0) * 2.5)}{' '}
-                        <span className="text-xs font-bold text-slate-500">min</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Driver/Status View */}
-                  {!activeTrip || activeTrip.status === 'pending' ? (
-                    <div className="mb-8 flex items-center gap-6 rounded-3xl border border-slate-100 bg-slate-50 p-6">
-                      <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <Car size={32} className="text-slate-400" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-lg font-black text-slate-900">Broadcasting to drivers...</p>
-                        <p className="text-sm font-medium text-slate-500">Your request is live.</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="mb-8 flex items-center gap-6 rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-                      <div className="relative">
-                        <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 text-slate-400">
-                          <User size={32} />
+                      <div className="mb-8 flex items-center gap-6 rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+                        <div className="relative">
+                          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 text-slate-400">
+                            <User size={32} />
+                          </div>
+                          <div className="absolute -right-2 -bottom-2 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-blue-500 text-[10px] text-white">
+                            ★
+                          </div>
                         </div>
-                        <div className="absolute -right-2 -bottom-2 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-blue-500 text-[10px] text-white">
-                          ★
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="mb-1 text-xl leading-none font-black text-slate-900">
-                          {activeTrip.driver?.username || 'Captain Ahmed'}
-                        </h4>
-                        <p className="text-xs font-bold tracking-wider text-slate-500 uppercase">
-                          Nissan Sunny •{' '}
-                          <span className="rounded bg-slate-100 px-2 py-0.5 font-black text-black">ط أ ر ٥٦٧٨</span>
-                        </p>
-                        {driverLocation && tripData?.pickup && activeTrip.status === 'accepted' && (
-                          <p className="mt-3 inline-block rounded-full bg-blue-50 px-3 py-1 text-[10px] font-black tracking-widest text-blue-600 uppercase">
-                            {
-                              calculateLiveETA(
-                                driverLocation.lat,
-                                driverLocation.lng,
-                                tripData.pickup.lat,
-                                tripData.pickup.lng
-                              ).time
-                            }{' '}
-                            mins away
+                        <div className="flex-1">
+                          <h4 className="mb-1 text-xl leading-none font-black text-slate-900">
+                            {activeTrip.driver?.username || 'Captain Ahmed'}
+                          </h4>
+                          <p className="text-xs font-bold tracking-wider text-slate-500 uppercase">
+                            Nissan Sunny •{' '}
+                            <span className="rounded bg-slate-100 px-2 py-0.5 font-black text-black">ط أ ر ٥٦٧٨</span>
                           </p>
-                        )}
+                          {driverLocation && tripData?.pickup && activeTrip.status === 'accepted' && (
+                            <p className="mt-3 inline-block rounded-full bg-blue-50 px-3 py-1 text-[10px] font-black tracking-widest text-blue-600 uppercase">
+                              {
+                                calculateLiveETA(
+                                  driverLocation.lat,
+                                  driverLocation.lng,
+                                  tripData.pickup.lat,
+                                  tripData.pickup.lng
+                                ).time
+                              }{' '}
+                              mins away
+                            </p>
+                          )}
+                        </div>
+                        <button className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+                          <Phone size={20} />
+                        </button>
                       </div>
-                      <button className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600">
-                        <Phone size={20} />
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Actions */}
-                  <div className="flex gap-4">
-                    <button
-                      onClick={() => setShowChat(true)}
-                      className="flex flex-2 items-center justify-center gap-3 rounded-full bg-slate-900 py-5 font-black text-white shadow-xl shadow-slate-900/20 transition-all hover:bg-slate-800 active:scale-95"
-                    >
-                      <MessageSquare size={20} />{' '}
-                      {activeTrip?.status === 'accepted' ? 'Chat with Captain' : 'Message Drivers'}
-                    </button>
-
-                    {(!activeTrip || activeTrip.status === 'pending' || activeTrip.status === 'accepted') && (
-                      <button
-                        onClick={handleCancelRide}
-                        className="flex flex-1 items-center justify-center rounded-full bg-red-50 py-5 font-black text-red-600 transition-colors hover:bg-red-100 active:scale-95"
-                      >
-                        Cancel
-                      </button>
                     )}
+
+                    {/* Actions (Moved up logically, mt-8 pushes it nicely to the end of the content) */}
+                    <div className="mt-8 flex gap-4">
+                      <button
+                        onClick={() => setShowChat(true)}
+                        className="flex w-full flex-2 items-center justify-center gap-3 rounded-full bg-slate-900 py-5 font-black text-white shadow-xl shadow-slate-900/20 transition-all hover:bg-slate-800 active:scale-95"
+                      >
+                        <MessageSquare size={20} />{' '}
+                        {activeTrip?.status === 'accepted' ? 'Chat with Captain' : 'Message Drivers'}
+                      </button>
+
+                      {(!activeTrip || activeTrip.status === 'pending' || activeTrip.status === 'accepted') && (
+                        <button
+                          onClick={handleCancelRide}
+                          className="flex w-full flex-1 items-center justify-center rounded-full bg-red-50 py-5 font-black text-red-600 transition-colors hover:bg-red-100 active:scale-95"
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </>
@@ -849,7 +851,7 @@ export default function TaxiBookingPage() {
                 ))}
               </div>
 
-              <div className="flex gap-3 border-t border-slate-100 bg-white p-4">
+              <div className="flex gap-3 border-t border-slate-100 bg-white p-4 pb-8 sm:pb-4">
                 <input
                   value={chatMsg}
                   onChange={(e) => setChatMsg(e.target.value)}

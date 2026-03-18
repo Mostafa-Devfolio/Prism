@@ -15,7 +15,6 @@ import { baseURL } from '@/app/[locale]/page';
 type products = { products: IProductDetailsPage };
 
 export default function ProductDescription({ products }: products) {
-  console.log(products)
   const [activeTab, setActiveTab] = useState<'details' | 'reviews' | 'related'>('details');
   const [isGrid, setIsGrid] = useState(true);
 

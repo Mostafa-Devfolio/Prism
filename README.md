@@ -87,7 +87,7 @@ To get a local copy up and running, follow these simple steps.
 
 1. **Clone the repository**
    ```sh
-   git clone [https://github.com/Mostafa-Devfolio/Prism.git](https://github.com/Mostafa-Devfolio/prism.git)
+   git clone [https://github.com/Mostafa-Devfolio/Prism.git](https://github.com/Mostafa-Devfolio/Prism.git)
 Navigate to the project directory
 
 Bash

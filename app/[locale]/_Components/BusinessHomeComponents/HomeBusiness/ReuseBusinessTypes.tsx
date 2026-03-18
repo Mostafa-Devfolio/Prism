@@ -13,7 +13,6 @@ type types = {
 };
 
 export default async function ReuseBusinessTypes({ id, busType, myE }: types) {
-  console.log(id);
   const token = await getLoginTo();
 
   if (id == 'restaurants' && token) {

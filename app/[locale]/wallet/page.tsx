@@ -17,7 +17,6 @@ export default function Wallet() {
   //   if (!token) return;
   //   const data = await getClass.getWalletHistory(token);
   //   setWallet(data.data);
-  //   console.log(wallet);
   // }
 
   // async function addWalletTo() {

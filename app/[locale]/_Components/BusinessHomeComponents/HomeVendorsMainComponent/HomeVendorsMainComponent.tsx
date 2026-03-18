@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { baseURL } from '@/app/[locale]/page';
 
 export default function HomeVendorsMainComponent({ vendor, businessTypee }: any) {
-  console.log(vendor)
   return (
     <div className="group flex flex-col rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
       <div className="relative aspect-4/3 w-full overflow-hidden rounded-t-3xl">

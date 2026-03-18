@@ -78,7 +78,6 @@ export default function CategoriesPageComponent({ categories, coupons, banners, 
   async function vendorPageProducts() {
     if (!whichSubCat) return;
     const data = await getClass.getVendorProduct(id, whichSubCat);
-    console.log(data);
     if (data?.data?.products) {
       setProducts(data.data.products);
     }

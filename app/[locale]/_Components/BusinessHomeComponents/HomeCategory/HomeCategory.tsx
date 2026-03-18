@@ -9,7 +9,6 @@ type id = { mainType: string };
 
 export default async function HomeCategory({ mainType }: id) {
   const categories: ICategoryHome[] = await getClass.getHomeCategories(mainType);
-  console.log(categories)
 
   return (
     <div className="no-scrollbar w-full snap-x snap-mandatory overflow-x-auto pb-4">

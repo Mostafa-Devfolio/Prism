@@ -158,10 +158,15 @@ export default function NavBar() {
             <LightDarkMode />
           </div>
 
-          <div className="pointer-events-none absolute top-1/2 left-1/2 z-0 flex max-w-[40vw] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
-            <h2 className="truncate text-lg font-black tracking-tighter text-slate-900 uppercase dark:text-white">
-              {t('prism')}
-            </h2>
+          <div className="pointer-events-none absolute top-1/2 left-1/2 z-0 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center">
+            <div className="flex max-w-[40vw] items-center justify-center">
+              <h2 className="truncate text-lg font-black tracking-tighter text-slate-900 uppercase dark:text-white">
+                {t('prism')}
+              </h2>
+            </div>
+            <h6 className="text-[9px]">
+              Developed by <span className="text-amber-500">Mostafa Sherif</span>
+            </h6>
           </div>
 
           {/* Right Side: Language & Cart */}
@@ -210,12 +215,17 @@ export default function NavBar() {
       <nav className="sticky top-0 z-100 hidden w-full border-b border-slate-100 bg-white/85 shadow-sm backdrop-blur-xl transition-all sm:block dark:bg-black/60">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-4 lg:gap-6">
-            <Link
-              href="/"
-              className="shrink-0 text-2xl font-black tracking-tighter text-slate-900 transition-transform hover:scale-105 dark:text-white"
-            >
-              {t('prism')}
-            </Link>
+            <div className="shrink-0">
+              <Link
+                href="/"
+                className="text-2xl font-black tracking-tighter text-slate-900 transition-transform hover:scale-105 dark:text-white"
+              >
+                {t('prism')}
+              </Link>
+              <h6 className="pl-2 text-[10px]">
+                Developed by <span className="text-amber-500">Mostafa Sherif</span>
+              </h6>
+            </div>
             <div
               onClick={() => router.push('/address')}
               className="flex max-w-60 min-w-0 cursor-pointer items-center gap-2.5 rounded-full border border-slate-200/60 bg-slate-100/80 px-4 py-2 transition-colors hover:bg-slate-200"

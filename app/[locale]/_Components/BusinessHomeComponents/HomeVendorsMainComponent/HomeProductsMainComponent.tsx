@@ -20,9 +20,7 @@ export default function HomeProductsMainComponent({ product, businessTypee }: an
     const body = {
       productId: productId,
     };
-    const data = await getClass.addWishList(token, body);
-    console.log(data);
-    
+    const data = await getClass.addWishList(token, body);    
   }
 
   async function deleteWishList() {

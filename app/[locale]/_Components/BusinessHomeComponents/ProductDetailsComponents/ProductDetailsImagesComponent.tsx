@@ -10,7 +10,6 @@ type Product = {
 };
 
 export default function ProductDetailsImagesComponent({ products }: Product) {
-  console.log(products)
   const [selectedImage, setSelectedImage] = useState<string | null>(products.images?.[0]?.url ?? null);
 
   return (

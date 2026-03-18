@@ -5,23 +5,24 @@ import React from 'react';
 import Link from 'next/link';
 import { useCartCount } from '@/lib/ContextAPI/cartCount';
 import { Home, ShoppingBag, FileText, User } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 export default function Statusbar() {
   const t = useTranslations('PRISM');
   const pathName = usePathname();
+  const locale = useLocale();
   const [isSelected, setIsSelected] = useState(-1);
   const { countt } = useCartCount();
 
   useEffect(() => {
     function getReady() {
-      if (pathName == '/') {
+      if (pathName == `/${locale}`) {
         setIsSelected(0);
-      } else if (pathName == '/cart') {
+      } else if (pathName == `/${locale}/cart`) {
         setIsSelected(1);
-      } else if (pathName == '/orders') {
+      } else if (pathName == `/${locale}/orders`) {
         setIsSelected(2);
-      } else if (pathName == '/profile') {
+      } else if (pathName == `/${locale}/profile`) {
         setIsSelected(3);
       }
     }
@@ -29,10 +30,10 @@ export default function Statusbar() {
   }, [pathName]);
 
   const navItems = [
-    { id: 0, label: t('home'), href: '/', icon: Home },
-    { id: 1, label: t('cart'), href: '/cart', icon: ShoppingBag },
-    { id: 2, label: t('orders'), href: '/orders', icon: FileText },
-    { id: 3, label: t('profile'), href: '/profile', icon: User },
+    { id: 0, label: t('home'), href: `/${locale}`, icon: Home },
+    { id: 1, label: t('cart'), href: `/${locale}/cart`, icon: ShoppingBag },
+    { id: 2, label: t('orders'), href: `/${locale}/orders`, icon: FileText },
+    { id: 3, label: t('profile'), href: `/${locale}/profile`, icon: User },
   ];
 
   return (
