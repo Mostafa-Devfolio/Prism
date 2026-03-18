@@ -23,7 +23,7 @@ import {
 } from '@/app/[locale]/interface/interfaceForApiService';
 
 class ApiServices {
-  baseUrl = '***REMOVED***/api/';
+  baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   async getAllVendor(businessTypee: string, mainType: string) {
     const query: string[] = [];

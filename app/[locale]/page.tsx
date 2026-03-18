@@ -9,8 +9,8 @@ import SetBusiness from './_Components/BusinessHomeComponents/HomeBusiness/SetBu
 import { IBooking } from './interface/booking';
 import { getTranslations } from 'next-intl/server';
 
-export const baseURL = '***REMOVED***';
-export const baseURL2 = `***REMOVED***/api/`;
+export const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
+export const baseURL2 = process.env.NEXT_PUBLIC_API_URL;
 
 export default async function Home() {
   const t = await getTranslations('PRISM');
